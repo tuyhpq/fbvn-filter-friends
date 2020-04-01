@@ -2,8 +2,9 @@ import Vue from "vue";
 
 import "./plugins/lodash";
 import "./plugins/moment";
-import "./plugins/bootstrap";
 import "./plugins/axios";
+import "./plugins/bootstrap";
+import "./plugins/vee-validate";
 
 import App from "./App.vue";
 import router from "./router";
