@@ -1,6 +1,7 @@
 import Vue from "vue";
 
 import "./plugins/lodash";
+import "./plugins/moment";
 import "./plugins/bootstrap";
 import "./plugins/axios";
 
