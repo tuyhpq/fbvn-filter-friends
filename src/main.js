@@ -6,6 +6,7 @@ import "./plugins/axios";
 import "./plugins/bootstrap";
 import "./plugins/vee-validate";
 import "./plugins/vue-fontawesome";
+import "./plugins/requests";
 
 import App from "./App.vue";
 import router from "./router";
