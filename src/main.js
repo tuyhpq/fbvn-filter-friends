@@ -1,11 +1,14 @@
 import Vue from "vue";
 
 import "./plugins/lodash";
+import "./plugins/common";
 import "./plugins/moment";
 import "./plugins/axios";
 import "./plugins/bootstrap";
 import "./plugins/vee-validate";
 import "./plugins/vue-fontawesome";
+import "./plugins/sweetalert2";
+import "./plugins/loader";
 import "./plugins/requests";
 
 import App from "./App.vue";
