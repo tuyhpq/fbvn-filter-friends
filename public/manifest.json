@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "FBVN - Lọc bạn bè",
+  "version": "1.0",
+
+  "description": "Lọc bạn bè không tương tác.",
+  "icons": {
+    "16": "img/logo.png",
+    "48": "img/logo.png"
+  },
+
+  "browser_action": {},
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "options_page": "index.html"
+}
