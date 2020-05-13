@@ -1,5 +1,8 @@
 import Vue from "vue";
 
+import "./plugins/jquery";
+import "./plugins/overlay-scrollbars";
+import "./plugins/admin-lte";
 import "./plugins/lodash";
 import "./plugins/common";
 import "./plugins/moment";
