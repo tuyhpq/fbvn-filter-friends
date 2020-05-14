@@ -65,7 +65,7 @@
 
       <!-- Main content -->
       <section class="content">
-        <router-view></router-view>
+        <router-view v-if="$store.state.user.id"></router-view>
       </section>
     </div>
 

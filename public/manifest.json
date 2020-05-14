@@ -16,5 +16,5 @@
   },
   "options_page": "index.html",
 
-  "permissions": ["https://m.facebook.com/"]
+  "permissions": ["https://*.facebook.com/"]
 }
