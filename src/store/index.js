@@ -5,8 +5,14 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
+  state: {
+    user: {}
+  },
+  mutations: {
+    login(state, { user }) {
+      state.user = user;
+    }
+  },
   actions: {},
   modules: {},
   plugins: [createPersistedState()]

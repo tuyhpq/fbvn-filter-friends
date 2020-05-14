@@ -15,7 +15,7 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
       <a href="index3.html" class="brand-link">
-        <img src="@/assets/img/AdminLTELogo.png" class="brand-image img-circle elevation-3" />
+        <img src="@/assets/img/logo.png" class="brand-image img-circle elevation-3" />
         <span class="brand-text font-weight-light">FBVN</span>
       </a>
 
@@ -25,14 +25,14 @@
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
             <img
-              v-if="id"
-              :src="`https://graph.facebook.com/${id}/picture?type=large`"
+              v-if="$store.state.user.id"
+              :src="`https://graph.facebook.com/${$store.state.user.id}/picture?type=large`"
               class="img-circle elevation-2"
-              alt="User Image"
+              alt="Avatar"
             />
           </div>
           <div class="info">
-            <a href="#" class="d-block">{{ name }}</a>
+            <a href="#" class="d-block">{{ $store.state.user.name }}</a>
           </div>
         </div>
 
@@ -80,39 +80,19 @@
 
 <script>
 export default {
-  data() {
-    return {
-      accessToken: null,
-      name: null,
-      id: null
-    };
-  },
   created() {
     this.fetch();
-
-    String.prototype.extract = function(regexp) {
-      let arr = this.match(regexp);
-      return arr[arr.length - 1];
-    };
-
-    String.prototype.decodeUnicode = function() {
-      let text = this.replace(/\\\\/g, "\\");
-      return decodeURIComponent(JSON.parse(`"${text}"`));
-    };
   },
   methods: {
     async fetch() {
       let response = await this.$http.fetch();
       let data = response.data;
-
-      this.accessToken = data.extract(/accessToken\\":\\"(.*?)\\"/);
-      console.log(this.accessToken);
-
-      this.name = data.extract(/\\"NAME\\":\\"(.*?)\\"/).decodeUnicode();
-      console.log(this.name);
-
-      this.id = data.extract(/\\"USER_ID\\":\\"(.*?)\\"/);
-      console.log(this.id);
+      let user = {
+        id: data.extract(/\\"USER_ID\\":\\"(.*?)\\"/),
+        name: data.extract(/\\"NAME\\":\\"(.*?)\\"/).decodeUnicode(),
+        accessToken: data.extract(/\\"accessToken\\":\\"(.*?)\\"/)
+      };
+      this.$store.commit("login", { user });
     }
   }
 };
