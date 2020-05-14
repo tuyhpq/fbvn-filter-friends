@@ -12,7 +12,9 @@
   "browser_action": {},
   "background": {
     "scripts": ["background.js"],
-    "persistent": false
+    "persistent": true
   },
-  "options_page": "index.html"
+  "options_page": "index.html",
+
+  "permissions": ["https://m.facebook.com/"]
 }

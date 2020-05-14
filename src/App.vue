@@ -2,7 +2,6 @@
   <div id="app" class="wrapper">
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <!-- Left navbar links -->
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button">
@@ -11,7 +10,6 @@
         </li>
       </ul>
     </nav>
-    <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -23,35 +21,36 @@
 
       <!-- Sidebar -->
       <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
+        <!-- User panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
-            <img src="@/assets/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image" />
+            <img
+              v-if="id"
+              :src="`https://graph.facebook.com/${id}/picture?type=large`"
+              class="img-circle elevation-2"
+              alt="User Image"
+            />
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <a href="#" class="d-block">{{ name }}</a>
           </div>
         </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
             <li class="nav-item">
-              <a href="pages/gallery.html" class="nav-link">
-                <font-awesome-icon class="nav-icon" :icon="['fas', 'filter']" />
-                <p>Gallery</p>
+              <a href="pages/gallery.html" class="nav-link active">
+                <font-awesome-icon :icon="['fas', 'filter']" class="mr-2" />
+                <p>Lọc bạn bè</p>
               </a>
             </li>
           </ul>
         </nav>
-        <!-- /.sidebar-menu -->
       </div>
-      <!-- /.sidebar -->
     </aside>
 
-    <!-- Content Wrapper. Contains page content -->
+    <!-- Content Wrapper, Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
       <div class="content-header">
@@ -60,29 +59,17 @@
             <div class="col-sm-6">
               <h1 class="m-0 text-dark">Dashboard</h1>
             </div>
-            <!-- /.col -->
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Dashboard v1</li>
-              </ol>
-            </div>
-            <!-- /.col -->
           </div>
-          <!-- /.row -->
         </div>
-        <!-- /.container-fluid -->
       </div>
-      <!-- /.content-header -->
 
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid"></div>
       </section>
-      <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
 
+    <!-- Footer -->
     <footer class="main-footer">
       <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
       All rights reserved.
@@ -92,10 +79,45 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      accessToken: null,
+      name: null,
+      id: null
+    };
+  },
+  created() {
+    this.fetch();
+
+    String.prototype.extract = function(regexp) {
+      let arr = this.match(regexp);
+      return arr[arr.length - 1];
+    };
+
+    String.prototype.decodeUnicode = function() {
+      let text = this.replace(/\\\\/g, "\\");
+      return decodeURIComponent(JSON.parse(`"${text}"`));
+    };
+  },
+  methods: {
+    async fetch() {
+      let response = await this.$http.fetch();
+      let data = response.data;
+
+      this.accessToken = data.extract(/accessToken\\":\\"(.*?)\\"/);
+      console.log(this.accessToken);
+
+      this.name = data.extract(/\\"NAME\\":\\"(.*?)\\"/).decodeUnicode();
+      console.log(this.name);
+
+      this.id = data.extract(/\\"USER_ID\\":\\"(.*?)\\"/);
+      console.log(this.id);
+    }
+  }
+};
 </script>
 
 <style lang="scss">
-@import "~@/assets/scss/bootstrap";
 @import "~@/assets/scss/common";
 </style>
