@@ -14,10 +14,10 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="index3.html" class="brand-link">
+      <router-link :to="{ name: 'Home' }" class="brand-link">
         <img src="@/assets/img/logo.png" class="brand-image img-circle elevation-3" />
         <span class="brand-text font-weight-light">FBVN</span>
-      </a>
+      </router-link>
 
       <!-- Sidebar -->
       <div class="sidebar">
@@ -40,10 +40,10 @@
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <a href="pages/gallery.html" class="nav-link active">
+              <router-link :to="{ name: 'Home' }" class="nav-link active">
                 <font-awesome-icon :icon="['fas', 'filter']" class="mr-2" />
                 <p>Lọc bạn bè</p>
-              </a>
+              </router-link>
             </li>
           </ul>
         </nav>
@@ -57,7 +57,7 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Dashboard</h1>
+              <h1 class="m-0 text-dark text-uppercase">{{ $route.meta.title }}</h1>
             </div>
           </div>
         </div>
@@ -65,21 +65,26 @@
 
       <!-- Main content -->
       <section class="content">
-        <div class="container-fluid"></div>
+        <router-view></router-view>
       </section>
     </div>
 
     <!-- Footer -->
     <footer class="main-footer">
-      <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
-      All rights reserved.
-      <div class="float-right d-none d-sm-inline-block"><b>Version</b> 3.0.4</div>
+      <strong>Tác giả: QuyHP</strong>
+      (Số điện thoại: 0348403817, Email: tuyhpq@gmail.com)
+      <div class="float-right d-none d-sm-inline-block">Phiên bản {{ version }}</div>
     </footer>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      version: process.env.VUE_APP_VERSION
+    };
+  },
   created() {
     this.fetch();
   },
@@ -93,6 +98,13 @@ export default {
         accessToken: data.extract(/\\"accessToken\\":\\"(.*?)\\"/)
       };
       this.$store.commit("login", { user });
+    }
+  },
+  watch: {
+    $route() {
+      this.$nextTick(() => {
+        document.title = "FBVN | " + this.$route.meta.title;
+      });
     }
   }
 };
