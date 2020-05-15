@@ -1,18 +1,17 @@
 import Vue from "vue";
 
+import $axios from "./axios";
 import $store from "@/store";
 
-const axios = Vue.prototype.$axios;
-
-const API_VERSION = "v7.0";
+const API_VERSION = process.env.VUE_APP_FACEBOOK_API_VERSION;
 const USER = $store.state.user;
 
 const http = {
   fetch() {
-    return axios.get("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed");
+    return $axios.get("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed");
   },
   getFriendList() {
-    return axios.get(`https://graph.facebook.com/${API_VERSION}/me/friends`, {
+    return $axios.get(`https://graph.facebook.com/${API_VERSION}/me/friends`, {
       params: {
         access_token: USER.accessToken,
         fields: "id,name,location{location{region_id,country}}",
@@ -45,7 +44,7 @@ const http = {
       formData.append(key, data[key]);
     }
 
-    return axios.post("https://www.facebook.com/api/graphql/", formData, {
+    return $axios.post("https://www.facebook.com/api/graphql/", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }

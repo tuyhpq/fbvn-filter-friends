@@ -48,3 +48,5 @@ _axios.interceptors.response.use(
 Object.defineProperty(Vue.prototype, "$axios", {
   value: _axios
 });
+
+export default _axios;
