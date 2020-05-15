@@ -12,10 +12,23 @@
             </h3>
           </div>
           <div class="card-body">
-            <button type="button" class="btn btn-default toastsDefaultDefault">
-              Launch Default Toast
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
+                  id="checkboxNotCountryVi"
+                  v-model="queries.notCountryVi"
+                />
+                <label for="checkboxNotCountryVi" class="custom-control-label">Quốc gia không phải Việt Nam</label>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="button" class="btn btn-info" @click="filterFriends">
+              Xem kết quả
+              <font-awesome-icon :icon="['fas', 'arrow-right']" />
             </button>
-            <div class="text-muted mt-3"></div>
           </div>
         </div>
       </div>
@@ -25,29 +38,28 @@
           <div class="card-header">
             <h3 class="card-title">
               <font-awesome-icon :icon="['fas', 'list']" />
-              Danh sách bạn bè được chọn
+              Danh sách bạn bè được chọn ({{ filterFriendList.length }})
             </h3>
           </div>
-          <div class="card-body table-responsive p-0">
-            <div class="m-2">
-              <button type="button" class="btn btn-primary" @click="unfriends">Hủy kết bạn</button>
-            </div>
-
-            <table class="table table-head-fixed text-nowrap">
+          <div class="card-body">
+            <button type="button" class="btn btn-primary" @click="unfriends">Hủy kết bạn</button>
+          </div>
+          <div class="card-body table-responsive p-0" style="height: 80vh;">
+            <table class="table table-head-fixed">
               <thead>
                 <tr>
-                  <th>
+                  <th width="10%">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox" class="custom-control-input" id="checkboxAll" />
                       <label for="checkboxAll" class="custom-control-label"></label>
                     </div>
                   </th>
-                  <th>ID</th>
-                  <th>TÊN</th>
+                  <th width="30%">ID</th>
+                  <th width="60%">Tên</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="friend in friendList" :key="friend.id">
+                <tr v-for="friend in filterFriendList" :key="friend.id">
                   <td class="align-middle">
                     <div class="custom-control custom-checkbox">
                       <input
@@ -65,7 +77,7 @@
                       <div class="align-self-center mr-1">
                         <img :src="`https://graph.facebook.com/${friend.id}/picture?type=small`" />
                       </div>
-                      <div class="align-self-center">
+                      <div class="align-self-center text-break">
                         <span class="username">
                           <a target="_blank" :href="`https://www.facebook.com/profile.php?id=${friend.id}`">
                             {{ friend.name }}
@@ -88,7 +100,11 @@
 export default {
   data() {
     return {
-      friendList: []
+      friendList: [],
+      filterFriendList: [],
+      queries: {
+        notCountryVi: false
+      }
     };
   },
   created() {
@@ -113,6 +129,18 @@ export default {
           }
         }
       }
+    },
+    filterFriends() {
+      this.filterFriendList = this.friendList.filter(friend => {
+        if (this.queries.notCountryVi) {
+          if (friend.location && friend.location.location) {
+            if (friend.location.location["country_code"] !== "VN") {
+              return true;
+            }
+          }
+        }
+        return false;
+      });
     }
   }
 };

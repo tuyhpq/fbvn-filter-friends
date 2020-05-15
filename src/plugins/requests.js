@@ -14,8 +14,8 @@ const http = {
     return $axios.get(`https://graph.facebook.com/${API_VERSION}/me/friends`, {
       params: {
         access_token: USER.accessToken,
-        fields: "id,name,location{location{region_id,country}}",
-        limit: 100
+        fields: "id,name,location{location{country,country_code}}",
+        limit: 10000
       }
     });
   },
