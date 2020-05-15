@@ -29,6 +29,10 @@
             </h3>
           </div>
           <div class="card-body table-responsive p-0">
+            <div class="m-2">
+              <button type="button" class="btn btn-primary" @click="unfriends">Hủy kết bạn</button>
+            </div>
+
             <table class="table table-head-fixed text-nowrap">
               <thead>
                 <tr>
@@ -46,7 +50,12 @@
                 <tr v-for="friend in friendList" :key="friend.id">
                   <td class="align-middle">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" :id="`checkbox${friend.id}`" />
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        :id="`checkbox${friend.id}`"
+                        v-model="friend.selected"
+                      />
                       <label :for="`checkbox${friend.id}`" class="custom-control-label"></label>
                     </div>
                   </td>
@@ -58,7 +67,9 @@
                       </div>
                       <div class="align-self-center">
                         <span class="username">
-                          <a :href="`https://www.facebook.com/profile.php?id=${friend.id}`">{{ friend.name }}</a>
+                          <a target="_blank" :href="`https://www.facebook.com/profile.php?id=${friend.id}`">
+                            {{ friend.name }}
+                          </a>
                         </span>
                       </div>
                     </div>
@@ -86,7 +97,22 @@ export default {
   methods: {
     async getFriendList() {
       let response = await this.$http.getFriendList(this.$store.state.user.accessToken);
+      for (let friend of response.data.data) {
+        friend.selected = false;
+      }
       this.friendList = response.data.data;
+    },
+    async unfriends() {
+      let unfriendList = this.friendList.filter(x => x.selected);
+      if (unfriendList.length > 0) {
+        let result = await this.$alert.confirm(`Bạn có chắc chắn muốn xóa ${unfriendList.length} người bạn không?`);
+        if (result.value) {
+          let response = await this.$http.removeFriend(unfriendList[0].id);
+          if (response) {
+            this.$alert.success("Hủy kết bạn thành công.");
+          }
+        }
+      }
     }
   }
 };
