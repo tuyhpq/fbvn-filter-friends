@@ -90,14 +90,17 @@ export default {
   },
   methods: {
     async fetch() {
-      let response = await this.$http.fetch();
-      let data = response.data;
-      let user = {
-        id: data.extract(/\\"USER_ID\\":\\"(.*?)\\"/),
-        name: data.extract(/\\"NAME\\":\\"(.*?)\\"/).decodeUnicode(),
-        accessToken: data.extract(/\\"accessToken\\":\\"(.*?)\\"/)
-      };
-      this.$store.commit("login", { user });
+      if (!this.$store.state.user.id) {
+        let response = await this.$http.fetch();
+        let data = response.data;
+        let user = {
+          id: data.extract(/\\"USER_ID\\":\\"(.*?)\\"/),
+          name: data.extract(/\\"NAME\\":\\"(.*?)\\"/).decodeUnicode(),
+          accessToken: data.extract(/\\"accessToken\\":\\"(.*?)\\"/),
+          dtsg: data.extract(/{\\"dtsg\\":{\\"token\\":\\"(.*?)\\"/)
+        };
+        this.$store.commit("login", { user });
+      }
     }
   },
   watch: {
