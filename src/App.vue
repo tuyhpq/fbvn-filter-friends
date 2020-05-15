@@ -75,6 +75,11 @@
       (Số điện thoại: 0348403817, Email: tuyhpq@gmail.com)
       <div class="float-right d-none d-sm-inline-block">Phiên bản {{ version }}</div>
     </footer>
+
+    <!-- Loading -->
+    <transition name="fade">
+      <div id="loading" v-if="showLoading"></div>
+    </transition>
   </div>
 </template>
 
@@ -82,11 +87,28 @@
 export default {
   data() {
     return {
-      version: process.env.VUE_APP_VERSION
+      version: process.env.VUE_APP_VERSION,
+      showLoading: false
     };
   },
   created() {
     this.fetch();
+
+    // override plugin for $loader
+    this.$loader.fadeIn = () => {
+      this.showLoading = true;
+    };
+    this.$loader.fadeOut = () => {
+      this.showLoading = false;
+    };
+
+    // override plugin for $axios loader
+    this.$axios.hookRequest = () => {
+      this.$loader.push();
+    };
+    this.$axios.hookResponse = () => {
+      this.$loader.pop();
+    };
   },
   methods: {
     async fetch() {
@@ -115,4 +137,42 @@ export default {
 
 <style lang="scss">
 @import "~@/assets/scss/common";
+
+#loading {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1055;
+}
+
+#loading::after {
+  content: "";
+  display: inline-block;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+  color: #ffc107;
+  width: 5rem;
+  height: 5rem;
+}
+
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter-active {
+  transition: opacity 0.1s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
