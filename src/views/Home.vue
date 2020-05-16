@@ -135,10 +135,36 @@ export default {
       if (unfriendList.length > 0) {
         let result = await this.$alert.confirm(`Bạn có chắc chắn muốn xóa ${unfriendList.length} người bạn không?`);
         if (result.value) {
-          let response = await this.$http.removeFriend(unfriendList[0].id);
-          if (response) {
-            this.$alert.success("Hủy kết bạn thành công.");
+          this.$loader.push();
+          await this.$common.sleep(100);
+          await this.$nextTick();
+
+          while (unfriendList.length > 0) {
+            let unfriend = unfriendList[0];
+            let response = await this.$http.removeFriend(unfriend.id);
+            if (response) {
+              this.$alert.toastSuccess(
+                `Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thành công.`
+              );
+            } else {
+              this.$alert.toastError(
+                `Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thất bại.`
+              );
+            }
+            unfriendList.removeAt(0);
+            this.filterFriendList.remove(unfriend);
+            this.friendList.remove(unfriend);
+
+            await this.$common.sleep(3000);
+
+            if (unfriendList.length === 0) {
+              this.$alert.success("Hủy kết bạn thành công.");
+            }
           }
+
+          await this.$common.sleep(500);
+          await this.$nextTick();
+          this.$loader.pop();
         }
       }
     },
