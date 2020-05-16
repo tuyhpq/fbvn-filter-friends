@@ -11,5 +11,9 @@ String.prototype.decodeUnicode = function() {
 };
 
 Object.defineProperty(Vue.prototype, "$common", {
-  value: {}
+  value: {
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  }
 });

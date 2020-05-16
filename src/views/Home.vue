@@ -130,17 +130,29 @@ export default {
         }
       }
     },
-    filterFriends() {
-      this.filterFriendList = this.friendList.filter(friend => {
-        if (this.queries.notCountryVi) {
-          if (friend.location && friend.location.location) {
-            if (friend.location.location["country_code"] !== "VN") {
-              return true;
+    async filterFriends() {
+      this.$loader.fadeIn();
+      await this.$common.sleep(100);
+      await this.$nextTick();
+
+      if (!this.queries.notCountryVi) {
+        this.filterFriendList = this.friendList;
+      } else {
+        this.filterFriendList = this.friendList.filter(friend => {
+          if (this.queries.notCountryVi) {
+            if (friend.location && friend.location.location) {
+              if (friend.location.location["country_code"] !== "VN") {
+                return true;
+              }
             }
           }
-        }
-        return false;
-      });
+          return false;
+        });
+      }
+
+      await this.$common.sleep(500);
+      await this.$nextTick();
+      this.$loader.fadeOut();
     }
   }
 };
