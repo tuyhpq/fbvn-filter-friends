@@ -23,6 +23,17 @@
                 <label for="checkboxNotCountryVi" class="custom-control-label">Quốc gia không phải Việt Nam</label>
               </div>
             </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
+                  id="checkboxNotAvatar"
+                  v-model="queries.notAvatar"
+                />
+                <label for="checkboxNotAvatar" class="custom-control-label">Không có ảnh đại diện</label>
+              </div>
+            </div>
           </div>
           <div class="card-footer">
             <button type="button" class="btn btn-info" @click="filterFriends">
@@ -75,7 +86,7 @@
                   <td class="align-middle">
                     <div class="d-flex">
                       <div class="align-self-center mr-1">
-                        <img :src="`https://graph.facebook.com/${friend.id}/picture?type=small`" />
+                        <img :src="friend.picture.data.url" />
                       </div>
                       <div class="align-self-center text-break">
                         <span class="username">
@@ -103,7 +114,8 @@ export default {
       friendList: [],
       filterFriendList: [],
       queries: {
-        notCountryVi: false
+        notCountryVi: false,
+        notAvatar: false
       }
     };
   },
@@ -135,13 +147,22 @@ export default {
       await this.$common.sleep(100);
       await this.$nextTick();
 
-      if (!this.queries.notCountryVi) {
+      if (!this.queries.notCountryVi && !this.queries.notAvatar) {
         this.filterFriendList = this.friendList;
       } else {
         this.filterFriendList = this.friendList.filter(friend => {
+          // Not CountryVi
           if (this.queries.notCountryVi) {
             if (friend.location && friend.location.location) {
               if (friend.location.location["country_code"] !== "VN") {
+                return true;
+              }
+            }
+          }
+          // Not Avatar
+          if (this.queries.notAvatar) {
+            if (friend.picture && friend.picture.data) {
+              if (friend.picture.data["is_silhouette"] === true) {
                 return true;
               }
             }
