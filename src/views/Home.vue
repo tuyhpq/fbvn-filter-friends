@@ -39,10 +39,12 @@
                 <input
                   class="custom-control-input"
                   type="checkbox"
-                  id="checkboxJoinedTime"
-                  v-model="queries.joinedTime"
+                  id="checkboxSpecialCharacters"
+                  v-model="queries.specialCharacters"
                 />
-                <label for="checkboxJoinedTime" class="custom-control-label">Thời gian tham gia Facebook</label>
+                <label for="checkboxSpecialCharacters" class="custom-control-label"
+                  >Tên không chứa kí tự đặc biệt
+                </label>
               </div>
             </div>
             <div class="form-group">
@@ -181,10 +183,11 @@ export default {
       queries: {
         notCountryVi: false,
         notAvatar: false,
-        joinedTime: false,
+        specialCharacters: false,
         notPosts: false,
         notPostsValue: "1w"
       },
+      regexName: /^[\saAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ]*$/u,
       nowTime: this.$moment().unix(),
       oneWeekAgo: this.$moment()
         .subtract(1, "w")
@@ -251,7 +254,12 @@ export default {
       await this.$common.sleep(100);
       await this.$nextTick();
 
-      if (!this.queries.notCountryVi && !this.queries.notAvatar && !this.queries.notPosts) {
+      if (
+        !this.queries.notCountryVi &&
+        !this.queries.notAvatar &&
+        !this.queries.notPosts &&
+        !this.queries.specialCharacters
+      ) {
         this.filterFriendList = this.friendList;
       } else {
         this.filterFriendList = this.friendList.filter(friend => {
@@ -270,6 +278,10 @@ export default {
                 return true;
               }
             }
+          }
+          // Not SpecialCharacters
+          if (this.queries.specialCharacters) {
+            return !this.regexName.test(friend.name.normalize("NFC"));
           }
           // Not Posts
           if (this.queries.notPosts) {
