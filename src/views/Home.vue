@@ -8,7 +8,7 @@
           <div class="card-header">
             <h3 class="card-title">
               <font-awesome-icon :icon="['fas', 'search']" />
-              Điều kiện lọc bạn bè
+              Điều kiện lọc bạn bè (bạn có {{ friendList.length }} bạn bè)
             </h3>
           </div>
           <div class="card-body">
@@ -32,6 +32,71 @@
                   v-model="queries.notAvatar"
                 />
                 <label for="checkboxNotAvatar" class="custom-control-label">Không có ảnh đại diện</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
+                  id="checkboxJoinedTime"
+                  v-model="queries.joinedTime"
+                />
+                <label for="checkboxJoinedTime" class="custom-control-label">Thời gian tham gia Facebook</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input class="custom-control-input" type="checkbox" id="checkboxNotPosts" v-model="queries.notPosts" />
+                <label for="checkboxNotPosts" class="custom-control-label">
+                  Không đăng bài trong một khoảng thời gian
+                </label>
+              </div>
+              <div class="pl-3" v-show="queries.notPosts">
+                <div class="custom-control custom-radio">
+                  <input
+                    class="custom-control-input"
+                    type="radio"
+                    id="radioNotPosts1"
+                    name="radioNotPosts"
+                    value="1w"
+                    v-model="queries.notPostsValue"
+                  />
+                  <label for="radioNotPosts1" class="custom-control-label">1 tuần gần đây</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input
+                    class="custom-control-input"
+                    type="radio"
+                    id="radioNotPosts2"
+                    name="radioNotPosts"
+                    value="1M"
+                    v-model="queries.notPostsValue"
+                  />
+                  <label for="radioNotPosts2" class="custom-control-label">1 tháng gần đây</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input
+                    class="custom-control-input"
+                    type="radio"
+                    id="radioNotPosts3"
+                    name="radioNotPosts"
+                    value="1y"
+                    v-model="queries.notPostsValue"
+                  />
+                  <label for="radioNotPosts3" class="custom-control-label">1 năm gần đây</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input
+                    class="custom-control-input"
+                    type="radio"
+                    id="radioNotPosts4"
+                    name="radioNotPosts"
+                    value=""
+                    v-model="queries.notPostsValue"
+                  />
+                  <label for="radioNotPosts4" class="custom-control-label">Không đăng bài nào</label>
+                </div>
               </div>
             </div>
           </div>
@@ -115,8 +180,21 @@ export default {
       filterFriendList: [],
       queries: {
         notCountryVi: false,
-        notAvatar: false
-      }
+        notAvatar: false,
+        joinedTime: false,
+        notPosts: false,
+        notPostsValue: "1w"
+      },
+      nowTime: this.$moment().unix(),
+      oneWeekAgo: this.$moment()
+        .subtract(1, "w")
+        .unix(),
+      oneMonthAgo: this.$moment()
+        .subtract(1, "M")
+        .unix(),
+      oneYearAgo: this.$moment()
+        .subtract(1, "y")
+        .unix()
     };
   },
   created() {
@@ -173,7 +251,7 @@ export default {
       await this.$common.sleep(100);
       await this.$nextTick();
 
-      if (!this.queries.notCountryVi && !this.queries.notAvatar) {
+      if (!this.queries.notCountryVi && !this.queries.notAvatar && !this.queries.notPosts) {
         this.filterFriendList = this.friendList;
       } else {
         this.filterFriendList = this.friendList.filter(friend => {
@@ -191,6 +269,21 @@ export default {
               if (friend.picture.data["is_silhouette"] === true) {
                 return true;
               }
+            }
+          }
+          // Not Posts
+          if (this.queries.notPosts) {
+            if (friend.posts && friend.posts.data && friend.posts.data.length > 0) {
+              let recentPostTime = this.$moment(friend.posts.data[0].created_time).unix();
+              if (this.queries.notPostsValue === "1w") {
+                return recentPostTime < this.oneWeekAgo;
+              } else if (this.queries.notPostsValue === "1M") {
+                return recentPostTime < this.oneMonthAgo;
+              } else if (this.queries.notPostsValue === "1y") {
+                return recentPostTime < this.oneYearAgo;
+              }
+            } else {
+              return true;
             }
           }
           return false;

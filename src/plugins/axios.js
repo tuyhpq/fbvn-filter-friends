@@ -25,7 +25,6 @@ _axios.interceptors.request.use(
   function(error) {
     // Do something with request error
     _axios.hookResponse(error.config);
-    return Promise.reject(error);
   }
 );
 
@@ -41,7 +40,6 @@ _axios.interceptors.response.use(
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     _axios.hookResponse(error.config);
-    return Promise.reject(error);
   }
 );
 
