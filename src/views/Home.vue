@@ -8,10 +8,16 @@
           <div class="card-header">
             <h3 class="card-title">
               <font-awesome-icon :icon="['fas', 'search']" />
-              Điều kiện lọc bạn bè (bạn có {{ friendList.length }} bạn bè)
+              Tìm kiếm bạn bè cần lọc (bạn có {{ friendList.length }} bạn bè)
             </h3>
           </div>
           <div class="card-body">
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input class="custom-control-input" type="checkbox" id="checkboxGender" v-model="queries.gender" />
+                <label for="checkboxGender" class="custom-control-label">Giới tính</label>
+              </div>
+            </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
                 <input
@@ -180,6 +186,7 @@ export default {
     return {
       friendList: [],
       filterFriendList: [],
+      loadedFriendsCountry: false,
       queries: {
         notCountryVi: false,
         notAvatar: false,
@@ -201,15 +208,37 @@ export default {
     };
   },
   created() {
-    this.getFriendList();
+    this.getFriendList(() => {
+      this.loadFriendsCountry();
+    });
   },
   methods: {
-    async getFriendList() {
-      let response = await this.$http.getFriendList(this.$store.state.user.accessToken);
-      for (let friend of response.data.data) {
+    async getFriendList(next) {
+      let response = await this.$http.getFriendList();
+      let friendList = response.data.data;
+
+      for (let friend of friendList) {
         friend.selected = false;
       }
-      this.friendList = response.data.data;
+      this.friendList = friendList;
+      next && next();
+    },
+    async loadFriendsCountry() {
+      let response = await this.$http.getFriendList([
+        "location{location{country,country_code}}",
+        "hometown{location{country,country_code}}",
+        "locale"
+      ]);
+      let countryFriendList = response.data.data;
+
+      for (let friend of this.friendList) {
+        let countryFriend = countryFriendList.find(x => x.id === friend.id);
+        if (countryFriend) {
+          friend["location"] = countryFriend["location"];
+          friend["hometown"] = countryFriend["hometown"];
+          friend["locale"] = countryFriend["locale"];
+        }
+      }
     },
     async unfriends() {
       let unfriendList = this.friendList.filter(x => x.selected);
