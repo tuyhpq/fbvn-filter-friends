@@ -49,8 +49,8 @@
                   id="checkboxSpecialCharacters"
                   v-model="queries.specialCharacters"
                 />
-                <label for="checkboxSpecialCharacters" class="custom-control-label"
-                  >Tên không chứa kí tự đặc biệt
+                <label for="checkboxSpecialCharacters" class="custom-control-label">
+                  Tên chứa kí tự đặc biệt
                 </label>
               </div>
             </div>
@@ -285,53 +285,46 @@ export default {
       await this.$common.sleep(100);
       await this.$nextTick();
 
-      if (
-        !this.queries.notCountryVi &&
-        !this.queries.notAvatar &&
-        !this.queries.notPosts &&
-        !this.queries.specialCharacters
-      ) {
-        this.filterFriendList = this.friendList;
-      } else {
-        this.filterFriendList = this.friendList.filter(friend => {
-          // Not CountryVi
-          if (this.queries.notCountryVi) {
-            if (friend.location && friend.location.location) {
-              if (friend.location.location["country_code"] !== "VN") {
-                return true;
-              }
+      this.filterFriendList = this.friendList.filter(friend => {
+        // Not CountryVi
+        if (this.queries.notCountryVi) {
+          if (
+            friend.locale === "vi_VN" ||
+            (friend.location && friend.location.location && friend.location.location["country_code"] === "VN") ||
+            (friend.hometown && friend.hometown.location && friend.hometown.location["country_code"] === "VN")
+          ) {
+            return false;
+          }
+        }
+        // Not Avatar
+        if (this.queries.notAvatar) {
+          if (friend.picture && friend.picture.data && friend.picture.data["is_silhouette"] === false) {
+            return false;
+          }
+        }
+        // Not SpecialCharacters
+        if (this.queries.specialCharacters) {
+          if (this.regexName.test(friend.name.normalize("NFC"))) {
+            return false;
+          }
+        }
+        // Not Posts
+        if (this.queries.notPosts) {
+          if (friend.posts && friend.posts.data && friend.posts.data.length > 0) {
+            let recentPostTime = this.$moment(friend.posts.data[0].created_time).unix();
+            if (this.queries.notPostsValue === "1w") {
+              return recentPostTime < this.oneWeekAgo;
+            } else if (this.queries.notPostsValue === "1M") {
+              return recentPostTime < this.oneMonthAgo;
+            } else if (this.queries.notPostsValue === "1y") {
+              return recentPostTime < this.oneYearAgo;
             }
+          } else {
+            return true;
           }
-          // Not Avatar
-          if (this.queries.notAvatar) {
-            if (friend.picture && friend.picture.data) {
-              if (friend.picture.data["is_silhouette"] === true) {
-                return true;
-              }
-            }
-          }
-          // Not SpecialCharacters
-          if (this.queries.specialCharacters) {
-            return !this.regexName.test(friend.name.normalize("NFC"));
-          }
-          // Not Posts
-          if (this.queries.notPosts) {
-            if (friend.posts && friend.posts.data && friend.posts.data.length > 0) {
-              let recentPostTime = this.$moment(friend.posts.data[0].created_time).unix();
-              if (this.queries.notPostsValue === "1w") {
-                return recentPostTime < this.oneWeekAgo;
-              } else if (this.queries.notPostsValue === "1M") {
-                return recentPostTime < this.oneMonthAgo;
-              } else if (this.queries.notPostsValue === "1y") {
-                return recentPostTime < this.oneYearAgo;
-              }
-            } else {
-              return true;
-            }
-          }
-          return false;
-        });
-      }
+        }
+        return true;
+      });
 
       await this.$common.sleep(500);
       await this.$nextTick();
