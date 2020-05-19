@@ -17,6 +17,38 @@
                 <input class="custom-control-input" type="checkbox" id="checkboxGender" v-model="queries.gender" />
                 <label for="checkboxGender" class="custom-control-label">Giới tính</label>
               </div>
+              <div class="pl-3" v-show="queries.gender">
+                <div class="custom-control custom-checkbox">
+                  <input
+                    class="custom-control-input"
+                    type="checkbox"
+                    id="customMale"
+                    value="male"
+                    v-model="queries.genderValue"
+                  />
+                  <label for="customMale" class="custom-control-label">Nam</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input
+                    class="custom-control-input"
+                    type="checkbox"
+                    id="customFemale"
+                    value="female"
+                    v-model="queries.genderValue"
+                  />
+                  <label for="customFemale" class="custom-control-label">Nữ</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input
+                    class="custom-control-input"
+                    type="checkbox"
+                    id="customUnknownGender"
+                    value="unknown"
+                    v-model="queries.genderValue"
+                  />
+                  <label for="customUnknownGender" class="custom-control-label">Không xác định</label>
+                </div>
+              </div>
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
@@ -189,6 +221,8 @@ export default {
       filterFriendList: [],
       loadedFriendsCountry: false,
       queries: {
+        gender: false,
+        genderValue: ["male", "unknown"],
         notCountryVi: false,
         notAvatar: false,
         specialCharacters: false,
@@ -220,6 +254,9 @@ export default {
 
       for (let friend of friendList) {
         friend.selected = false;
+        if (friend.gender !== "male" && friend.gender !== "female") {
+          friend.gender = "unknown";
+        }
       }
       this.friendList = friendList;
       next && next();
@@ -286,6 +323,12 @@ export default {
       await this.$nextTick();
 
       this.filterFriendList = this.friendList.filter(friend => {
+        // Gender
+        if (this.queries.gender) {
+          if (this.queries.genderValue.indexOf(friend.gender) < 0) {
+            return false;
+          }
+        }
         // Not CountryVi
         if (this.queries.notCountryVi) {
           if (
