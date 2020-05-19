@@ -103,11 +103,11 @@ export default {
     };
 
     // override plugin for $axios loader
-    this.$axios.hookRequest = () => {
-      this.$loader.push();
+    this.$axios.hookRequest = config => {
+      config && !config.notLoading && this.$loader.push();
     };
-    this.$axios.hookResponse = () => {
-      this.$loader.pop();
+    this.$axios.hookResponse = config => {
+      config && !config.notLoading && this.$loader.pop();
     };
   },
   methods: {

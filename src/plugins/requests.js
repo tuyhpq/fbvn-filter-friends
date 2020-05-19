@@ -10,13 +10,14 @@ const http = {
   fetch() {
     return $axios.get("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed");
   },
-  getFriendList(fields = ["name", "picture{is_silhouette,url}"], limit = 5000) {
+  getFriendList(fields = ["name", "picture{is_silhouette,url}"], limit = 5000, notLoading = false) {
     return $axios.get(`https://graph.facebook.com/${API_VERSION}/me/friends`, {
       params: {
         access_token: USER.accessToken,
         fields: ["id", ...fields].join(","),
         limit
-      }
+      },
+      notLoading
     });
   },
   removeFriend(friendId) {

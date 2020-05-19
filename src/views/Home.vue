@@ -25,6 +25,7 @@
                   type="checkbox"
                   id="checkboxNotCountryVi"
                   v-model="queries.notCountryVi"
+                  :disabled="!loadedFriendsCountry"
                 />
                 <label for="checkboxNotCountryVi" class="custom-control-label">Quốc gia không phải Việt Nam</label>
               </div>
@@ -224,11 +225,11 @@ export default {
       next && next();
     },
     async loadFriendsCountry() {
-      let response = await this.$http.getFriendList([
-        "location{location{country,country_code}}",
-        "hometown{location{country,country_code}}",
-        "locale"
-      ]);
+      let response = await this.$http.getFriendList(
+        ["location{location{country,country_code}}", "hometown{location{country,country_code}}", "locale"],
+        5000,
+        true
+      );
       let countryFriendList = response.data.data;
 
       for (let friend of this.friendList) {
@@ -239,6 +240,7 @@ export default {
           friend["locale"] = countryFriend["locale"];
         }
       }
+      this.loadedFriendsCountry = true;
     },
     async unfriends() {
       let unfriendList = this.friendList.filter(x => x.selected);
