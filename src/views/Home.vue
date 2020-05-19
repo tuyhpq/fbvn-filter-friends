@@ -173,7 +173,7 @@
             </h3>
           </div>
           <div class="card-body">
-            <button type="button" class="btn btn-primary" @click="unfriends">Hủy kết bạn</button>
+            <button type="button" class="btn btn-danger" @click="unfriends">Hủy kết bạn</button>
           </div>
           <div class="card-body table-responsive p-0" style="height: 80vh;">
             <table class="table table-head-fixed">

@@ -32,7 +32,13 @@
             />
           </div>
           <div class="info">
-            <a href="#" class="d-block">{{ $store.state.user.name }}</a>
+            <a
+              :href="`https://www.facebook.com/profile.php?id=${$store.state.user.id}`"
+              target="_blank"
+              class="d-block"
+            >
+              {{ $store.state.user.name }}
+            </a>
           </div>
         </div>
 
