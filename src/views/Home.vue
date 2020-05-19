@@ -57,9 +57,14 @@
                   type="checkbox"
                   id="checkboxNotCountryVi"
                   v-model="queries.notCountryVi"
-                  :disabled="!loadedFriendsCountry"
+                  :disabled="loadedFriendsCountry !== 100"
                 />
-                <label for="checkboxNotCountryVi" class="custom-control-label">Quốc gia không phải Việt Nam</label>
+                <label for="checkboxNotCountryVi" class="custom-control-label">
+                  Quốc gia không phải Việt Nam
+                  <template v-if="loadedFriendsCountry !== 100">
+                    (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedFriendsCountry }}%)
+                  </template>
+                </label>
               </div>
             </div>
             <div class="form-group">
@@ -88,9 +93,18 @@
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
-                <input class="custom-control-input" type="checkbox" id="checkboxNotPosts" v-model="queries.notPosts" />
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
+                  id="checkboxNotPosts"
+                  v-model="queries.notPosts"
+                  :disabled="loadedFriendsPost !== 100"
+                />
                 <label for="checkboxNotPosts" class="custom-control-label">
                   Không đăng bài trong một khoảng thời gian
+                  <template v-if="loadedFriendsPost !== 100">
+                    (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedFriendsPost }}%)
+                  </template>
                 </label>
               </div>
               <div class="pl-3" v-show="queries.notPosts">
@@ -100,10 +114,10 @@
                     type="radio"
                     id="radioNotPosts1"
                     name="radioNotPosts"
-                    value="1w"
+                    value="3d"
                     v-model="queries.notPostsValue"
                   />
-                  <label for="radioNotPosts1" class="custom-control-label">1 tuần gần đây</label>
+                  <label for="radioNotPosts1" class="custom-control-label">3 ngày gần đây</label>
                 </div>
                 <div class="custom-control custom-radio">
                   <input
@@ -111,10 +125,10 @@
                     type="radio"
                     id="radioNotPosts2"
                     name="radioNotPosts"
-                    value="1M"
+                    value="1w"
                     v-model="queries.notPostsValue"
                   />
-                  <label for="radioNotPosts2" class="custom-control-label">1 tháng gần đây</label>
+                  <label for="radioNotPosts2" class="custom-control-label">1 tuần gần đây</label>
                 </div>
                 <div class="custom-control custom-radio">
                   <input
@@ -122,10 +136,10 @@
                     type="radio"
                     id="radioNotPosts3"
                     name="radioNotPosts"
-                    value="1y"
+                    value="1M"
                     v-model="queries.notPostsValue"
                   />
-                  <label for="radioNotPosts3" class="custom-control-label">1 năm gần đây</label>
+                  <label for="radioNotPosts3" class="custom-control-label">1 tháng gần đây</label>
                 </div>
                 <div class="custom-control custom-radio">
                   <input
@@ -133,10 +147,10 @@
                     type="radio"
                     id="radioNotPosts4"
                     name="radioNotPosts"
-                    value=""
+                    value="1y"
                     v-model="queries.notPostsValue"
                   />
-                  <label for="radioNotPosts4" class="custom-control-label">Không đăng bài nào</label>
+                  <label for="radioNotPosts4" class="custom-control-label">1 năm gần đây</label>
                 </div>
               </div>
             </div>
@@ -219,7 +233,8 @@ export default {
     return {
       friendList: [],
       filterFriendList: [],
-      loadedFriendsCountry: false,
+      loadedFriendsCountry: 0,
+      loadedFriendsPost: 0,
       queries: {
         gender: false,
         genderValue: ["male", "unknown"],
@@ -231,6 +246,9 @@ export default {
       },
       regexName: /^[\saAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ]*$/u,
       nowTime: this.$moment().unix(),
+      threeDayAgo: this.$moment()
+        .subtract(3, "d")
+        .unix(),
       oneWeekAgo: this.$moment()
         .subtract(1, "w")
         .unix(),
@@ -245,6 +263,7 @@ export default {
   created() {
     this.getFriendList(() => {
       this.loadFriendsCountry();
+      this.loadFriendsPost();
     });
   },
   methods: {
@@ -277,7 +296,28 @@ export default {
           friend["locale"] = countryFriend["locale"];
         }
       }
-      this.loadedFriendsCountry = true;
+      this.loadedFriendsCountry = 100;
+    },
+    async loadFriendsPost() {
+      let response = await this.$http.getFriendList(
+        [`posts.since(${this.oneYearAgo}).limit(10){created_time}`],
+        50,
+        true
+      );
+      let postFriendList = response.data.data;
+      while (response.data.paging.next) {
+        response = await this.$axios.get(response.data.paging.next, { notLoading: true });
+        postFriendList = postFriendList.concat(response.data.data);
+        this.loadedFriendsPost = Math.round((postFriendList.length * 100) / this.friendList.length);
+      }
+
+      for (let friend of this.friendList) {
+        let postFriend = postFriendList.find(x => x.id === friend.id);
+        if (postFriend) {
+          friend["posts"] = postFriend["posts"];
+        }
+      }
+      this.loadedFriendsPost = 100;
     },
     async unfriends() {
       let unfriendList = this.friendList.filter(x => x.selected);
@@ -355,17 +395,20 @@ export default {
         if (this.queries.notPosts) {
           if (friend.posts && friend.posts.data && friend.posts.data.length > 0) {
             let recentPostTime = this.$moment(friend.posts.data[0].created_time).unix();
-            if (this.queries.notPostsValue === "1w") {
-              return recentPostTime < this.oneWeekAgo;
-            } else if (this.queries.notPostsValue === "1M") {
-              return recentPostTime < this.oneMonthAgo;
-            } else if (this.queries.notPostsValue === "1y") {
-              return recentPostTime < this.oneYearAgo;
+            let timeAgo =
+              this.queries.notPostsValue === "3d"
+                ? this.threeDayAgo
+                : this.queries.notPostsValue === "1w"
+                ? this.oneWeekAgo
+                : this.queries.notPostsValue === "1M"
+                ? this.oneMonthAgo
+                : this.oneYearAgo;
+            if (recentPostTime > timeAgo) {
+              return false;
             }
-          } else {
-            return true;
           }
         }
+
         return true;
       });
 
