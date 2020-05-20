@@ -228,6 +228,32 @@
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            <span class="badge badge-info mr-1">Mẹo</span>
+            <label class="mr-3 mb-0">Bôi đen cột ID để</label>
+            <div class="custom-control custom-radio custom-control-inline">
+              <input
+                class="custom-control-input"
+                type="radio"
+                id="radioSelection1"
+                name="radioSelection"
+                value="CHECK"
+                v-model="selectionMode"
+              />
+              <label for="radioSelection1" class="custom-control-label">Chọn</label>
+            </div>
+            <div class="custom-control custom-radio custom-control-inline">
+              <input
+                class="custom-control-input"
+                type="radio"
+                id="radioSelection2"
+                name="radioSelection"
+                value="UNCHECK"
+                v-model="selectionMode"
+              />
+              <label for="radioSelection2" class="custom-control-label">Bỏ chọn</label>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -252,6 +278,7 @@ export default {
         notPostsValue: "1w"
       },
       selectedAllFriend: false,
+      selectionMode: "CHECK",
       regexName: /^[\saAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ]*$/u,
       nowTime: this.$moment().unix(),
       threeDayAgo: this.$moment()
@@ -273,6 +300,7 @@ export default {
       this.loadFriendsCountry();
       this.loadFriendsPost();
     });
+    document.body.addEventListener("mouseup", this.selectionEventListener);
   },
   methods: {
     selectAllFriend() {
@@ -448,7 +476,23 @@ export default {
       await this.$common.sleep(500);
       await this.$nextTick();
       this.$loader.fadeOut();
+    },
+    selectionEventListener() {
+      let selectionMode = this.selectionMode === "CHECK";
+      let text = window.getSelection().toString();
+      let ids = text.match(/[0-9]+/g);
+      if (ids) {
+        ids.forEach(id => {
+          let friend = this.filterFriendList.find(x => x.id === id);
+          if (friend) {
+            friend.selected = selectionMode;
+          }
+        });
+      }
     }
+  },
+  beforeDestroy() {
+    document.body.removeEventListener("mouseup", this.selectionEventListener);
   }
 };
 </script>
