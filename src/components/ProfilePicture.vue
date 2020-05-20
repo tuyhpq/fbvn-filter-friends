@@ -4,7 +4,7 @@
       <img class="profile-user-img img-fluid img-circle" :src="$store.state.user.avatarUrl" />
     </div>
 
-    <div class="form-group text-center mt-1">
+    <div class="form-group text-center mt-2">
       <div class="custom-control custom-switch" v-if="hasAvatarGuard !== null">
         <input type="checkbox" class="custom-control-input" id="avatarGuard" v-model="hasAvatarGuard" />
         <label class="custom-control-label font-weight-normal font-italic" for="avatarGuard">
