@@ -4,7 +4,7 @@ import $axios from "./axios";
 import $store from "@/store";
 
 const API_VERSION = process.env.VUE_APP_FACEBOOK_API_VERSION;
-const USER = $store.state.user;
+const USER = () => $store.state.user;
 
 const http = {
   fetch() {
@@ -13,7 +13,7 @@ const http = {
   getFriendList(fields = ["name", "picture{is_silhouette,url}", "gender"], limit = 5000, notLoading = false) {
     return $axios.get(`https://graph.facebook.com/${API_VERSION}/me/friends`, {
       params: {
-        access_token: USER.accessToken,
+        access_token: USER().accessToken,
         fields: ["id", ...fields].join(","),
         limit
       },
@@ -22,10 +22,10 @@ const http = {
   },
   removeFriend(friendId) {
     let data = {
-      __user: USER.id,
+      __user: USER().id,
       __a: "1",
       dpr: "1",
-      fb_dtsg: USER.dtsg,
+      fb_dtsg: USER().dtsg,
       fb_api_caller_class: "RelayModern",
       fb_api_req_friendly_name: "FriendingCometUnfriendMutation",
       doc_id: "2316924651742928",
