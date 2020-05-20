@@ -50,6 +50,24 @@ const http = {
         "Content-Type": "multipart/form-data"
       }
     });
+  },
+  profilePictureGuard(status) {
+    let data = {
+      fb_dtsg: USER().dtsg,
+      variables: `{"0":{"is_shielded":${status},"actor_id":"${USER().id}","client_mutation_id":"FBVN"}}`,
+      doc_id: "1477043292367183"
+    };
+
+    let formData = new FormData();
+    for (let key in data) {
+      formData.append(key, data[key]);
+    }
+
+    return $axios.post("https://www.facebook.com/api/graphql/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
   }
 };
 
