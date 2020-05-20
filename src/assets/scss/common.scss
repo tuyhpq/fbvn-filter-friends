@@ -2,3 +2,24 @@
   min-width: 100px;
   min-height: 100px;
 }
+
+.avatar-guard {
+  position: relative;
+}
+
+.avatar-guard .profile-user-img {
+  border-color: #3578e5;
+}
+
+.avatar-guard::after {
+  content: "";
+  position: absolute;
+  background-image: url("~@/assets/img/avatar-guard.png");
+  background-repeat: no-repeat;
+  background-size: auto;
+  background-position: 0 -41px;
+  bottom: -10px;
+  height: 22px;
+  margin-left: -61px;
+  width: 22px;
+}
