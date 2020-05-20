@@ -24,21 +24,12 @@
         <!-- User panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
-            <img
-              v-if="$store.state.user.id"
-              :src="`https://graph.facebook.com/${$store.state.user.id}/picture?type=large`"
-              class="img-circle elevation-2"
-              alt="Avatar"
-            />
+            <img v-if="$store.state.user.avatarUrl" :src="$store.state.user.avatarUrl" class="img-circle elevation-2" />
           </div>
           <div class="info">
-            <a
-              :href="`https://www.facebook.com/profile.php?id=${$store.state.user.id}`"
-              target="_blank"
-              class="d-block"
-            >
+            <router-link :to="{ name: 'Profile' }" class="d-block">
               {{ $store.state.user.name }}
-            </a>
+            </router-link>
           </div>
         </div>
 
@@ -127,6 +118,8 @@ export default {
           accessToken: data.extract(/\\"accessToken\\":\\"(.*?)\\"/),
           dtsg: data.extract(/{\\"dtsg\\":{\\"token\\":\\"(.*?)\\"/)
         };
+        user.avatarUrl = `https://graph.facebook.com/${user.id}/picture?type=large`;
+        user.profileUrl = `https://www.facebook.com/profile.php?id=${user.id}`;
         this.$store.commit("login", { user });
       }
     }

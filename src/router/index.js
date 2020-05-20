@@ -11,6 +11,14 @@ const routes = [
     meta: {
       title: "Lọc bạn bè"
     }
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: () => import("@/views/Profile.vue"),
+    meta: {
+      title: "Thông tin người dùng"
+    }
   }
 ];
 
