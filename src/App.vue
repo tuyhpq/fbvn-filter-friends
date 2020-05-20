@@ -37,7 +37,7 @@
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <router-link :to="{ name: 'FriendsFilter' }" class="nav-link active">
+              <router-link :to="{ name: 'FriendsFilter' }" class="nav-link" active-class="active">
                 <font-awesome-icon :icon="['fas', 'filter']" class="mr-2" />
                 <p>Lọc bạn bè</p>
               </router-link>
