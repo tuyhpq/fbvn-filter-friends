@@ -181,7 +181,13 @@
                 <tr>
                   <th width="10%">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="checkboxAll" />
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="checkboxAll"
+                        v-model="selectedAllFriend"
+                        @change="selectAllFriend"
+                      />
                       <label for="checkboxAll" class="custom-control-label"></label>
                     </div>
                   </th>
@@ -198,6 +204,7 @@
                         class="custom-control-input"
                         :id="`checkbox${friend.id}`"
                         v-model="friend.selected"
+                        @change="selectFriend(friend.selected)"
                       />
                       <label :for="`checkbox${friend.id}`" class="custom-control-label"></label>
                     </div>
@@ -244,6 +251,7 @@ export default {
         notPosts: false,
         notPostsValue: "1w"
       },
+      selectedAllFriend: false,
       regexName: /^[\saAàÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬbBcCdDđĐeEèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆfFgGhHiIìÌỉỈĩĨíÍịỊjJkKlLmMnNoOòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢpPqQrRsStTuUùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰvVwWxXyYỳỲỷỶỹỸýÝỵỴzZ]*$/u,
       nowTime: this.$moment().unix(),
       threeDayAgo: this.$moment()
@@ -267,6 +275,25 @@ export default {
     });
   },
   methods: {
+    selectAllFriend() {
+      this.filterFriendList.forEach(friend => {
+        friend.selected = this.selectedAllFriend;
+      });
+    },
+    selectFriend(selected) {
+      this.$nextTick(() => {
+        if (!selected) {
+          this.selectedAllFriend = false;
+        } else {
+          for (let friend of this.filterFriendList) {
+            if (!friend.selected) {
+              return;
+            }
+          }
+          this.selectedAllFriend = true;
+        }
+      });
+    },
     async getFriendList(next) {
       let response = await this.$http.getFriendList();
       let friendList = response.data.data;
@@ -320,7 +347,7 @@ export default {
       this.loadedFriendsPost = 100;
     },
     async unfriends() {
-      let unfriendList = this.friendList.filter(x => x.selected);
+      let unfriendList = this.filterFriendList.filter(x => x.selected);
       if (unfriendList.length > 0) {
         let result = await this.$alert.confirm(`Bạn có chắc chắn muốn xóa ${unfriendList.length} người bạn không?`);
         if (result.value) {
@@ -409,8 +436,14 @@ export default {
           }
         }
 
+        // reset friend handle
+        friend.selected = false;
+
         return true;
       });
+
+      // reset variable handle
+      this.selectedAllFriend = false;
 
       await this.$common.sleep(500);
       await this.$nextTick();
