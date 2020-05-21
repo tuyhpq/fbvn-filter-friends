@@ -21,6 +21,14 @@ const routes = [
     }
   },
   {
+    path: "/friends-filter-interaction",
+    name: "FriendsFilterInteraction",
+    component: () => import("@/views/FriendsFilterInteraction.vue"),
+    meta: {
+      title: "Lọc bạn bè theo tương tác"
+    }
+  },
+  {
     path: "*",
     redirect: { name: "Profile" }
   }

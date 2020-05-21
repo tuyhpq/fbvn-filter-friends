@@ -42,6 +42,12 @@
                 <p>Lọc bạn bè</p>
               </router-link>
             </li>
+            <li class="nav-item">
+              <router-link :to="{ name: 'FriendsFilterInteraction' }" class="nav-link" active-class="active">
+                <font-awesome-icon :icon="['fas', 'sort-amount-down']" class="mr-2" />
+                <p>Lọc bạn bè theo tương tác</p>
+              </router-link>
+            </li>
           </ul>
         </nav>
       </div>
