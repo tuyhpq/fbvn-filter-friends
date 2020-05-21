@@ -206,11 +206,11 @@
                         v-model="friend.selected"
                         @change="selectFriend(friend.selected)"
                       />
-                      <label :for="`checkbox${friend.id}`" class="custom-control-label"></label>
+                      <label :for="`checkbox${friend.id}`" class="custom-control-label" v-once></label>
                     </div>
                   </td>
-                  <td class="align-middle">{{ friend.id }}</td>
-                  <td class="align-middle">
+                  <td class="align-middle" v-once>{{ friend.id }}</td>
+                  <td class="align-middle" v-once>
                     <div class="d-flex">
                       <div class="align-self-center mr-1">
                         <img :src="friend.picture.data.url" />

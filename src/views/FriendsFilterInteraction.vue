@@ -14,7 +14,7 @@
           <div class="card-body">
             <button type="button" class="btn btn-danger" @click="unfriends">Hủy kết bạn</button>
           </div>
-          <div class="card-body table-responsive p-0" style="height: 100vh;">
+          <div class="card-body table-responsive p-0" style="height: 80vh;">
             <table class="table table-head-fixed">
               <thead>
                 <tr>
@@ -47,11 +47,11 @@
                         v-model="friend.selected"
                         @change="selectFriend(friend.selected)"
                       />
-                      <label :for="`checkbox${friend.id}`" class="custom-control-label"></label>
+                      <label :for="`checkbox${friend.id}`" class="custom-control-label" v-once></label>
                     </div>
                   </td>
-                  <td class="align-middle">{{ friend.id }}</td>
-                  <td class="align-middle">
+                  <td class="align-middle" v-once>{{ friend.id }}</td>
+                  <td class="align-middle" v-once>
                     <div class="d-flex">
                       <div class="align-self-center mr-1">
                         <img :src="friend.picture.data.url" />
