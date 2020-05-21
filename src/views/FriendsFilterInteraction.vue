@@ -112,9 +112,15 @@ export default {
       selectionMode: "CHECK"
     };
   },
-  created() {
-    this.getFriendList();
+  async created() {
+    this.$loader.push();
+
+    await this.getFriendList();
+    await this.getFriendInteraction();
     document.body.addEventListener("mouseup", this.selectionEventListener);
+
+    await this.$common.sleep(500);
+    this.$loader.pop();
   },
   methods: {
     selectAllFriend() {
@@ -142,8 +148,46 @@ export default {
 
       for (let friend of friendList) {
         friend.selected = false;
+        friend.reaction = 0;
+        friend.comment = 0;
       }
       this.friendList = friendList;
+    },
+    async getFriendInteraction() {
+      let response = await this.$http.getInteraction();
+      let data = response.data[this.$store.state.user.id]["timeline_feed_units"];
+      let feeds = data.edges;
+      while (data["page_info"]["has_next_page"]) {
+        response = await this.$http.getInteraction(data["page_info"]["end_cursor"]);
+        data = response.data[this.$store.state.user.id]["timeline_feed_units"];
+        feeds = feeds.concat(data.edges);
+      }
+
+      let objectFriendList = {};
+      for (let friend of this.friendList) {
+        objectFriendList[friend.id] = friend;
+      }
+
+      for (let feed of feeds) {
+        if (feed["node"]["feedback"]) {
+          if (feed["node"]["feedback"]["commenters"]) {
+            for (let node of feed["node"]["feedback"]["commenters"]["nodes"]) {
+              if (objectFriendList[node.id]) {
+                objectFriendList[node.id].comment++;
+              }
+            }
+          }
+          if (feed["node"]["feedback"]["reactors"]) {
+            for (let node of feed["node"]["feedback"]["reactors"]["nodes"]) {
+              if (objectFriendList[node.id]) {
+                objectFriendList[node.id].reaction++;
+              }
+            }
+          }
+        }
+      }
+
+      this.friendList = this.$_.reverse(this.$_.sortBy(this.friendList, ["reaction", "comment"]));
     },
     async unfriends() {
       let unfriendList = this.friendList.filter(x => x.selected);
@@ -194,6 +238,13 @@ export default {
             friend.selected = selectionMode;
           }
         });
+        for (let friend of this.friendList) {
+          if (!friend.selected) {
+            this.selectedAllFriend = false;
+            return;
+          }
+        }
+        this.selectedAllFriend = true;
       }
     }
   },

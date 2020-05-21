@@ -488,6 +488,13 @@ export default {
             friend.selected = selectionMode;
           }
         });
+        for (let friend of this.filterFriendList) {
+          if (!friend.selected) {
+            this.selectedAllFriend = false;
+            return;
+          }
+        }
+        this.selectedAllFriend = true;
       }
     }
   },

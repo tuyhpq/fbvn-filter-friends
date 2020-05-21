@@ -68,6 +68,25 @@ const http = {
         "Content-Type": "multipart/form-data"
       }
     });
+  },
+  getInteraction(next = "") {
+    let data = {
+      fb_dtsg: USER().dtsg,
+      q:
+        `node(${USER().id}){timeline_feed_units.first(500).after(${next})` +
+        `{page_info,edges{node{id,creation_time,feedback{reactors{nodes{id}},commenters{nodes{id}}}}}}}`
+    };
+
+    let formData = new FormData();
+    for (let key in data) {
+      formData.append(key, data[key]);
+    }
+
+    return $axios.post("https://www.facebook.com/api/graphql/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
   }
 };
 
