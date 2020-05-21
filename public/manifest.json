@@ -5,8 +5,7 @@
 
   "description": "Lọc bạn bè không tương tác.",
   "icons": {
-    "16": "img/logo.png",
-    "48": "img/logo.png"
+    "600": "img/logo.png"
   },
 
   "browser_action": {},
