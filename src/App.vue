@@ -116,7 +116,7 @@ export default {
   methods: {
     async fetch() {
       let response = await this.$http.fetch();
-      if (response) {
+      if (response && response.config.url === response.request.responseURL) {
         let data = response.data;
         let user = {
           id: data.extract(/\\"USER_ID\\":\\"(.*?)\\"/),
@@ -129,7 +129,7 @@ export default {
         this.$store.commit("login", { user });
       } else {
         let message = "Vui lòng đăng nhập vào tài khoản Facebook để sử dụng các dịch vụ của chúng tôi.";
-        this.$alert(message).then(() => {
+        this.$alert.error(message).then(() => {
           window.location.replace("https://www.facebook.com/");
         });
       }
