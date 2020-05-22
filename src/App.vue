@@ -115,8 +115,8 @@ export default {
   },
   methods: {
     async fetch() {
-      if (!this.$store.state.user.id) {
-        let response = await this.$http.fetch();
+      let response = await this.$http.fetch();
+      if (response) {
         let data = response.data;
         let user = {
           id: data.extract(/\\"USER_ID\\":\\"(.*?)\\"/),
@@ -127,6 +127,11 @@ export default {
         user.avatarUrl = `https://graph.facebook.com/${user.id}/picture?type=large`;
         user.profileUrl = `https://www.facebook.com/profile.php?id=${user.id}`;
         this.$store.commit("login", { user });
+      } else {
+        let message = "Vui lòng đăng nhập vào tài khoản Facebook để sử dụng các dịch vụ của chúng tôi.";
+        this.$alert(message).then(() => {
+          window.location.replace("https://www.facebook.com/");
+        });
       }
     }
   },
