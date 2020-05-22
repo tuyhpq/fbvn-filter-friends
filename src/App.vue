@@ -143,6 +143,10 @@ export default {
 <style lang="scss">
 @import "~@/assets/scss/common";
 
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
 #loading {
   position: fixed;
   display: flex;
