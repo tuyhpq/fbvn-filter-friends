@@ -264,6 +264,7 @@
 export default {
   data() {
     return {
+      screenName: this.$route.name,
       friendList: [],
       filterFriendList: [],
       loadedFriendsCountry: 0,
@@ -365,7 +366,7 @@ export default {
       );
       if (response) {
         let postFriendList = response.data.data;
-        while (response && response.data.paging.next) {
+        while (response && response.data.paging.next && this.$route.name === this.screenName) {
           response = await this.$axios.get(response.data.paging.next, { notLoading: true });
           if (response) {
             postFriendList = postFriendList.concat(response.data.data);

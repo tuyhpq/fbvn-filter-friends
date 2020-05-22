@@ -107,6 +107,7 @@
 export default {
   data() {
     return {
+      screenName: this.$route.name,
       friendList: [],
       selectedAllFriend: false,
       selectionMode: "CHECK"
@@ -160,7 +161,7 @@ export default {
       if (response) {
         let data = response.data[this.$store.state.user.id]["timeline_feed_units"];
         let feeds = data.edges;
-        while (response && data["page_info"]["has_next_page"]) {
+        while (response && data["page_info"]["has_next_page"] && this.$route.name === this.screenName) {
           response = await this.$http.getInteraction(data["page_info"]["end_cursor"]);
           if (response) {
             data = response.data[this.$store.state.user.id]["timeline_feed_units"];
