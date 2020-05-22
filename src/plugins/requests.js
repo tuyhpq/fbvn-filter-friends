@@ -20,6 +20,24 @@ const http = {
       notLoading
     });
   },
+  getMutualFriends(next = "") {
+    let data = {
+      fb_dtsg: USER().dtsg,
+      q: `node(${USER().id}){friends.first(500).after(${next}){page_info,edges{node{id,mutual_friends{count},name}}}}`
+    };
+
+    let formData = new FormData();
+    for (let key in data) {
+      formData.append(key, data[key]);
+    }
+
+    return $axios.post("https://www.facebook.com/api/graphql/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      },
+      notLoading: true
+    });
+  },
   removeFriend(friendId) {
     let data = {
       __user: USER().id,

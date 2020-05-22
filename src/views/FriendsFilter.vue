@@ -55,6 +55,32 @@
                 <input
                   class="custom-control-input"
                   type="checkbox"
+                  id="checkboxMutualFriend"
+                  v-model="queries.mutualFriend"
+                  :disabled="loadedMutualFriends !== 100"
+                />
+                <label for="checkboxMutualFriend" class="custom-control-label">
+                  Số lượng bạn chung
+                  <template v-if="loadedMutualFriends !== 100">
+                    (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedMutualFriends }}%)
+                  </template>
+                </label>
+              </div>
+              <div class="pl-3 mt-1" v-show="queries.mutualFriend">
+                <label class="mr-1">Nhỏ hơn</label>
+                <input
+                  type="text"
+                  class="form-control w-auto d-inline-block"
+                  v-model="queries.mutualFriendValue"
+                  @blur="blurMutualFriendValue"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
                   id="checkboxNotCountryVi"
                   v-model="queries.notCountryVi"
                   :disabled="loadedFriendsCountry !== 100"
@@ -267,11 +293,14 @@ export default {
       screenName: this.$route.name,
       friendList: [],
       filterFriendList: [],
+      loadedMutualFriends: 0,
       loadedFriendsCountry: 0,
       loadedFriendsPost: 0,
       queries: {
         gender: false,
         genderValue: ["male", "unknown"],
+        mutualFriend: false,
+        mutualFriendValue: "1",
         notCountryVi: false,
         notAvatar: false,
         specialCharacters: false,
@@ -298,6 +327,7 @@ export default {
   },
   created() {
     this.getFriendList(() => {
+      this.loadMutualFriends();
       this.loadFriendsCountry();
       this.loadFriendsPost();
     });
@@ -336,6 +366,28 @@ export default {
         }
         this.friendList = friendList;
         next && next();
+      }
+    },
+    async loadMutualFriends() {
+      let response = await this.$http.getMutualFriends();
+      if (response) {
+        let data = response.data[this.$store.state.user.id]["friends"];
+        let mutualFriends = data.edges;
+        while (response && data["page_info"]["has_next_page"] && this.$route.name === this.screenName) {
+          response = await this.$http.getMutualFriends(data["page_info"]["end_cursor"]);
+          if (response) {
+            data = response.data[this.$store.state.user.id]["friends"];
+            mutualFriends = mutualFriends.concat(data.edges);
+          }
+        }
+
+        for (let friend of this.friendList) {
+          let mutualFriend = mutualFriends.find(x => x["node"]["id"] === friend.id);
+          if (mutualFriend) {
+            friend["mutualFriend"] = mutualFriend["node"]["mutual_friends"]["count"];
+          }
+        }
+        this.loadedMutualFriends = 100;
       }
     },
     async loadFriendsCountry() {
@@ -433,6 +485,12 @@ export default {
             return false;
           }
         }
+        // MutualFriend
+        if (this.queries.mutualFriend) {
+          if (friend.mutualFriend >= this.queries.mutualFriendValue) {
+            return false;
+          }
+        }
         // Not CountryVi
         if (this.queries.notCountryVi) {
           if (
@@ -504,6 +562,17 @@ export default {
           }
         }
         this.selectedAllFriend = true;
+      }
+    },
+    blurMutualFriendValue() {
+      if (
+        this.queries.mutualFriendValue.length === 0 ||
+        !isFinite(this.queries.mutualFriendValue) ||
+        parseInt(this.queries.mutualFriendValue) < 1
+      ) {
+        this.queries.mutualFriendValue = "1";
+      } else {
+        this.queries.mutualFriendValue = parseInt(this.queries.mutualFriendValue).toString();
       }
     }
   },
