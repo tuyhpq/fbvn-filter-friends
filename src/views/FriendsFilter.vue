@@ -480,7 +480,7 @@ export default {
 
       this.filterFriendList = this.friendList.filter(friend => {
         // Gender
-        if (this.queries.gender) {
+        if (this.queries.gender && this.queries.genderValue.length > 0) {
           if (this.queries.genderValue.indexOf(friend.gender) < 0) {
             return false;
           }
@@ -547,7 +547,7 @@ export default {
     selectionEventListener() {
       let selectionMode = this.selectionMode === "CHECK";
       let text = window.getSelection().toString();
-      let ids = text.match(/[0-9]+/g);
+      let ids = text.match(/[0-9]{5,}/g);
       if (ids) {
         ids.forEach(id => {
           let friend = this.filterFriendList.find(x => x.id === id);
