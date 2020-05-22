@@ -8,7 +8,7 @@ let config = {
 };
 
 const handleError = () => {
-  let message = "Mất kết nối với tài khoản Facebook của bạn. Vui lòng tải lại trang.";
+  let message = "Mất kết nối với tài khoản Facebook của bạn.<br>Vui lòng tải lại trang.";
   $alert.error(message).then(() => {
     window.location.reload();
   });
@@ -44,7 +44,10 @@ _axios.interceptors.response.use(
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
     _axios.hookResponse(response.config);
-    if (response && response.config.url === response.request.responseURL) {
+
+    let urlRequest = new URL(response.config.url);
+    let urlResponse = new URL(response.request.responseURL);
+    if (urlRequest.origin + urlRequest.pathname === urlResponse.origin + urlResponse.pathname) {
       return response;
     } else {
       let message = "Vui lòng đăng nhập vào tài khoản Facebook để sử dụng các dịch vụ của chúng tôi.";

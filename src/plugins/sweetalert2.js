@@ -18,7 +18,7 @@ const _alert = {
     return Swal.fire({
       icon: "success",
       title: "Thành Công",
-      text: text
+      html: text
     });
   },
   toastSuccess(text) {
@@ -31,7 +31,7 @@ const _alert = {
     return Swal.fire({
       icon: "error",
       title: "Lỗi",
-      text: text
+      html: text
     });
   },
   toastError(text) {
