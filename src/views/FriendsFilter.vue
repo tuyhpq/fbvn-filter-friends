@@ -356,7 +356,7 @@ export default {
     async loadFriendsPost() {
       let response = await this.$http.getFriendList(
         [`posts.since(${this.oneYearAgo}).limit(10){created_time}`],
-        50,
+        25,
         true
       );
       let postFriendList = response.data.data;
