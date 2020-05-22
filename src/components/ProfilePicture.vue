@@ -39,7 +39,9 @@ export default {
       let response = await this.$axios.get(`https://m.facebook.com/profile.php?id=${this.$store.state.user.id}`, {
         notLoading: true
       });
-      this.hasAvatarGuard = response.data.includes("_4dc_ _4dd0");
+      if (response) {
+        this.hasAvatarGuard = response.data.includes("_4dc_ _4dd0");
+      }
     }
   },
   watch: {

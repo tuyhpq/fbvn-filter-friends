@@ -324,16 +324,18 @@ export default {
     },
     async getFriendList(next) {
       let response = await this.$http.getFriendList();
-      let friendList = response.data.data;
+      if (response) {
+        let friendList = response.data.data;
 
-      for (let friend of friendList) {
-        friend.selected = false;
-        if (friend.gender !== "male" && friend.gender !== "female") {
-          friend.gender = "unknown";
+        for (let friend of friendList) {
+          friend.selected = false;
+          if (friend.gender !== "male" && friend.gender !== "female") {
+            friend.gender = "unknown";
+          }
         }
+        this.friendList = friendList;
+        next && next();
       }
-      this.friendList = friendList;
-      next && next();
     },
     async loadFriendsCountry() {
       let response = await this.$http.getFriendList(
@@ -341,17 +343,19 @@ export default {
         5000,
         true
       );
-      let countryFriendList = response.data.data;
+      if (response) {
+        let countryFriendList = response.data.data;
 
-      for (let friend of this.friendList) {
-        let countryFriend = countryFriendList.find(x => x.id === friend.id);
-        if (countryFriend) {
-          friend["location"] = countryFriend["location"];
-          friend["hometown"] = countryFriend["hometown"];
-          friend["locale"] = countryFriend["locale"];
+        for (let friend of this.friendList) {
+          let countryFriend = countryFriendList.find(x => x.id === friend.id);
+          if (countryFriend) {
+            friend["location"] = countryFriend["location"];
+            friend["hometown"] = countryFriend["hometown"];
+            friend["locale"] = countryFriend["locale"];
+          }
         }
+        this.loadedFriendsCountry = 100;
       }
-      this.loadedFriendsCountry = 100;
     },
     async loadFriendsPost() {
       let response = await this.$http.getFriendList(
@@ -359,20 +363,24 @@ export default {
         25,
         true
       );
-      let postFriendList = response.data.data;
-      while (response.data.paging.next) {
-        response = await this.$axios.get(response.data.paging.next, { notLoading: true });
-        postFriendList = postFriendList.concat(response.data.data);
-        this.loadedFriendsPost = Math.round((postFriendList.length * 100) / this.friendList.length);
-      }
-
-      for (let friend of this.friendList) {
-        let postFriend = postFriendList.find(x => x.id === friend.id);
-        if (postFriend) {
-          friend["posts"] = postFriend["posts"];
+      if (response) {
+        let postFriendList = response.data.data;
+        while (response && response.data.paging.next) {
+          response = await this.$axios.get(response.data.paging.next, { notLoading: true });
+          if (response) {
+            postFriendList = postFriendList.concat(response.data.data);
+          }
+          this.loadedFriendsPost = Math.round((postFriendList.length * 100) / this.friendList.length);
         }
+
+        for (let friend of this.friendList) {
+          let postFriend = postFriendList.find(x => x.id === friend.id);
+          if (postFriend) {
+            friend["posts"] = postFriend["posts"];
+          }
+        }
+        this.loadedFriendsPost = 100;
       }
-      this.loadedFriendsPost = 100;
     },
     async unfriends() {
       let unfriendList = this.filterFriendList.filter(x => x.selected);
