@@ -1,8 +1,17 @@
 import Vue from "vue";
 import axios from "axios";
 
+import $alert from "./sweetalert2";
+
 let config = {
   baseURL: process.env.VUE_APP_BASE_URL
+};
+
+const handleError = () => {
+  let message = "Mất kết nối với tài khoản Facebook của bạn.<br>Vui lòng tải lại trang.";
+  $alert.error(message).then(() => {
+    window.location.reload();
+  });
 };
 
 const _axios = axios.create(config);
@@ -24,8 +33,8 @@ _axios.interceptors.request.use(
   },
   function(error) {
     // Do something with request error
+    handleError();
     _axios.hookResponse(error.config);
-    return Promise.reject(error);
   }
 );
 
@@ -35,16 +44,28 @@ _axios.interceptors.response.use(
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
     _axios.hookResponse(response.config);
-    return response;
+
+    let urlRequest = new URL(response.config.url);
+    let urlResponse = new URL(response.request.responseURL);
+    if (urlRequest.origin + urlRequest.pathname === urlResponse.origin + urlResponse.pathname) {
+      return response;
+    } else {
+      let message = "Vui lòng đăng nhập vào tài khoản Facebook để sử dụng các dịch vụ của chúng tôi.";
+      $alert.error(message).then(() => {
+        window.location.replace("https://www.facebook.com/");
+      });
+    }
   },
   function(error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
+    handleError();
     _axios.hookResponse(error.config);
-    return Promise.reject(error);
   }
 );
 
 Object.defineProperty(Vue.prototype, "$axios", {
   value: _axios
 });
+
+export default _axios;
