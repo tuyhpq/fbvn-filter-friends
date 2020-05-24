@@ -219,7 +219,6 @@ export default {
             }
             unfriendList.removeAt(0);
             this.friendList.remove(unfriend);
-            this.friendList.remove(unfriend);
 
             await this.$common.sleep(3000);
 
@@ -237,7 +236,7 @@ export default {
     selectionEventListener() {
       let selectionMode = this.selectionMode === "CHECK";
       let text = window.getSelection().toString();
-      let ids = text.match(/[0-9]+/g);
+      let ids = text.match(/[0-9]{5,}/g);
       if (ids) {
         ids.forEach(id => {
           let friend = this.friendList.find(x => x.id === id);

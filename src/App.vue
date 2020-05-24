@@ -75,7 +75,7 @@
     <!-- Footer -->
     <footer class="main-footer">
       <strong>Tác giả: QUYHP</strong>
-      (Số điện thoại: 0348403817, Email: tuyhpq@gmail.com)
+      (Số điện thoại: 034.840.3817, Email: tuyhpq@gmail.com)
       <div class="float-right d-none d-sm-inline-block">Phiên bản {{ version }}</div>
     </footer>
 
