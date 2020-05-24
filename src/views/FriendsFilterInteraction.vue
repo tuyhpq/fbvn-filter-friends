@@ -219,7 +219,6 @@ export default {
             }
             unfriendList.removeAt(0);
             this.friendList.remove(unfriend);
-            this.friendList.remove(unfriend);
 
             await this.$common.sleep(3000);
 
