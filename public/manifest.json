@@ -3,7 +3,7 @@
   "name": "FBVN - Lọc bạn bè",
   "version": "1.0",
 
-  "description": "Lọc bạn bè không tương tác.",
+  "description": "Lọc bạn bè, lọc bạn bè ít hoặc không tương tác.",
   "icons": {
     "600": "img/logo.png"
   },
