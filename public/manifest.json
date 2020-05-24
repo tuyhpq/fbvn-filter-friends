@@ -15,5 +15,5 @@
   },
   "options_page": "index.html",
 
-  "permissions": ["https://*.facebook.com/", "webRequest", "webRequestBlocking", "cookies"]
+  "permissions": ["https://*.facebook.com/", "webRequest", "webRequestBlocking"]
 }

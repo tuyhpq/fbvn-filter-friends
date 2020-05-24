@@ -20,13 +20,6 @@
                 <p>{{ $store.state.user.accessToken }}</p>
               </li>
             </ul>
-
-            <ul class="list-group list-group-unbordered mb-3">
-              <li class="list-group-item">
-                <label for="accessToken">Cookies</label>
-                <p>{{ cookies }}</p>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
@@ -40,20 +33,6 @@ import ProfilePicture from "@/components/ProfilePicture.vue";
 export default {
   components: {
     ProfilePicture
-  },
-  data() {
-    return {
-      cookies: null
-    };
-  },
-  created() {
-    window.chrome.cookies.getAll({ url: "https://facebook.com/" }, cookies => {
-      this.cookies = cookies
-        .map(cookie => {
-          return `${cookie.name}=${cookie.value}`;
-        })
-        .join("; ");
-    });
   }
 };
 </script>
