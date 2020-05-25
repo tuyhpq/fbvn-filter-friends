@@ -1,14 +1,24 @@
 {
   "manifest_version": 2,
   "name": "FBVN - Lọc bạn bè không tương tác",
+  "short_name": "FBVN",
   "version": "1.0",
 
-  "description": "Lọc bạn bè, lọc bạn bè ít hoặc không tương tác.",
+  "description": "Tiện ích lọc bạn bè Facebook hoàn toàn miễn phí.",
   "icons": {
-    "600": "img/logo.png"
+    "16": "favicon.png",
+    "48": "favicon.png",
+    "128": "favicon.png"
   },
 
-  "browser_action": {},
+  "browser_action": {
+    "default_icon": {
+      "16": "favicon.png",
+      "24": "favicon.png",
+      "32": "favicon.png"
+    },
+    "default_title": "Lọc bạn bè không tương tác"
+  },
   "background": {
     "scripts": ["background.js"],
     "persistent": true
