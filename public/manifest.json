@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "FBVN - Lọc bạn bè không tương tác",
   "short_name": "FBVN",
-  "version": "1.0",
+  "version": "1.1",
 
   "description": "Tiện ích lọc bạn bè Facebook hoàn toàn miễn phí.",
   "icons": {
