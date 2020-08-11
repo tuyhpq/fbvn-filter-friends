@@ -29,6 +29,14 @@ const routes = [
     }
   },
   {
+    path: "/posts-moderator",
+    name: "PostsModerator",
+    component: () => import("@/views/PostsModerator.vue"),
+    meta: {
+      title: "Kiểm duyệt bài viết nhóm"
+    }
+  },
+  {
     path: "*",
     redirect: { name: "Profile" }
   }

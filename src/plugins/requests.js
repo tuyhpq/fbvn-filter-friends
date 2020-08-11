@@ -2,6 +2,7 @@ import Vue from "vue";
 
 import $axios from "./axios";
 import $store from "@/store";
+import qs from "qs";
 
 const API_VERSION = process.env.VUE_APP_FACEBOOK_API_VERSION;
 const USER = () => $store.state.user;
@@ -104,6 +105,131 @@ const http = {
       headers: {
         "Content-Type": "multipart/form-data"
       }
+    });
+  },
+  getFirstPendingPostsData({
+    groupId,
+    orderBy = "RECENT" // RECENT, CHRONOLOGICAL
+  }) {
+    var data = qs.stringify({
+      doc_id: "3829723863714756",
+      fb_api_req_friendly_name: "GroupsCometPendingPostsPostsSectionQuery",
+      fb_dtsg: USER().dtsg,
+      variables: JSON.stringify({
+        groupID: groupId,
+        pendingPostMetadataEnabled: true,
+        displayCommentsFeedbackContext: null,
+        displayCommentsContextEnableComment: null,
+        displayCommentsContextIsAdPreview: null,
+        displayCommentsContextIsAggregatedShare: null,
+        displayCommentsContextIsStorySet: null,
+        feedLocation: "GROUP_PENDING",
+        feedbackSource: 0,
+        focusCommentID: null,
+        scale: 1,
+        isComet: true,
+        useDefaultActor: false,
+        pendingStoriesOrderBy: orderBy,
+        privacySelectorRenderLocation: "COMET_STREAM",
+        renderLocation: "group_pending_queue",
+        UFI2CommentsProvider_commentsKey: "GroupsCometPendingPostsContent"
+      })
+    });
+    return $axios.post("https://www.facebook.com/api/graphql/?getFirstPendingPostsData", data, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      notLoading: true
+    });
+  },
+  getNextPendingPostsData({
+    cursor,
+    groupId,
+    orderBy = "RECENT" // RECENT, CHRONOLOGICAL
+  }) {
+    var data = qs.stringify({
+      doc_id: "4586194724724815",
+      fb_api_req_friendly_name: "GroupsCometPendingPostsFeedPaginationQuery",
+      fb_dtsg: USER().dtsg,
+      variables: JSON.stringify({
+        UFI2CommentsProvider_commentsKey: "GroupsCometPendingPostsContent",
+        count: 50,
+        cursor: cursor,
+        displayCommentsContextEnableComment: null,
+        displayCommentsContextIsAdPreview: null,
+        displayCommentsContextIsAggregatedShare: null,
+        displayCommentsContextIsStorySet: null,
+        displayCommentsFeedbackContext: null,
+        feedLocation: "GROUP_PENDING",
+        feedbackSource: 0,
+        focusCommentID: null,
+        isComet: true,
+        pendingPostMetadataEnabled: true,
+        pendingStoriesOrderBy: orderBy,
+        privacySelectorRenderLocation: "COMET_STREAM",
+        renderLocation: "group_pending_queue",
+        scale: 1,
+        useDefaultActor: false,
+        id: groupId
+      })
+    });
+    return $axios.post("https://www.facebook.com/api/graphql/?getNextPendingPostsData", data, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      notLoading: true
+    });
+  },
+  removePost({ postId, groupId }) {
+    var data = qs.stringify({
+      doc_id: "3365842253444071",
+      fb_api_req_friendly_name: "useGroupsCometDeclinePendingStoryMutation",
+      fb_dtsg: USER().dtsg,
+      variables: JSON.stringify({
+        input: {
+          group_id: groupId,
+          source: "group_pending_posts",
+          story_id: postId,
+          actor_id: "116416613072624",
+          client_mutation_id: "1"
+        },
+        memberID: "100049815155317"
+      })
+    });
+    return $axios.post("https://www.facebook.com/api/graphql/?removePost", data, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      notLoading: true
+    });
+  },
+  aprovePost({ postId, groupId }) {
+    var data = qs.stringify({
+      doc_id: "4092490014154806",
+      fb_api_req_friendly_name: "useGroupsCometApprovePendingStoryMutation",
+      fb_dtsg: USER().dtsg,
+      variables: JSON.stringify({
+        input: {
+          group_id: groupId,
+          story_id: postId,
+          actor_id: "116416613072624",
+          client_mutation_id: "1"
+        },
+        displayCommentsFeedbackContext: null,
+        displayCommentsContextEnableComment: null,
+        displayCommentsContextIsAdPreview: null,
+        displayCommentsContextIsAggregatedShare: null,
+        displayCommentsContextIsStorySet: null,
+        feedLocation: "GROUP",
+        feedbackSource: 0,
+        focusCommentID: null,
+        hoistStories: [],
+        scale: 1,
+        sortingSetting: null,
+        isComet: true,
+        useDefaultActor: false,
+        privacySelectorRenderLocation: "COMET_STREAM",
+        renderLocation: "group",
+        UFI2CommentsProvider_commentsKey: "CometGroupDiscussionRootSuccessQuery"
+      })
+    });
+    return $axios.post("https://www.facebook.com/api/graphql/?aprovePost", data, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      notLoading: true
     });
   }
 };
