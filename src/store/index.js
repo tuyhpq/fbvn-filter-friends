@@ -6,18 +6,22 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: {}
+    user: {},
+    rejectedContents: []
   },
   mutations: {
     login(state, { user }) {
       state.user = user;
+    },
+    pushRejectedContent(state, { content }) {
+      state.rejectedContents.push(content);
     }
   },
   actions: {},
   modules: {},
   plugins: [
     createPersistedState({
-      paths: []
+      paths: ["rejectedContents"]
     })
   ]
 });
