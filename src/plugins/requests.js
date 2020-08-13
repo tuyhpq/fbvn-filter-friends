@@ -112,6 +112,7 @@ const http = {
     orderBy = "RECENT" // RECENT, CHRONOLOGICAL
   }) {
     var data = qs.stringify({
+      av: "116416613072624",
       doc_id: "3829723863714756",
       fb_api_req_friendly_name: "GroupsCometPendingPostsPostsSectionQuery",
       fb_dtsg: USER().dtsg,
@@ -146,6 +147,7 @@ const http = {
     orderBy = "RECENT" // RECENT, CHRONOLOGICAL
   }) {
     var data = qs.stringify({
+      av: "116416613072624",
       doc_id: "4586194724724815",
       fb_api_req_friendly_name: "GroupsCometPendingPostsFeedPaginationQuery",
       fb_dtsg: USER().dtsg,
@@ -178,6 +180,7 @@ const http = {
   },
   removePost({ postId, groupId }) {
     var data = qs.stringify({
+      av: "116416613072624",
       doc_id: "3365842253444071",
       fb_api_req_friendly_name: "useGroupsCometDeclinePendingStoryMutation",
       fb_dtsg: USER().dtsg,
@@ -197,8 +200,9 @@ const http = {
       notLoading: true
     });
   },
-  aprovePost({ postId, groupId }) {
+  approvePost({ postId, groupId }) {
     var data = qs.stringify({
+      av: "116416613072624",
       doc_id: "4092490014154806",
       fb_api_req_friendly_name: "useGroupsCometApprovePendingStoryMutation",
       fb_dtsg: USER().dtsg,
@@ -227,7 +231,7 @@ const http = {
         UFI2CommentsProvider_commentsKey: "CometGroupDiscussionRootSuccessQuery"
       })
     });
-    return $axios.post("https://www.facebook.com/api/graphql/?aprovePost", data, {
+    return $axios.post("https://www.facebook.com/api/graphql/?approvePost", data, {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       notLoading: true
     });
