@@ -107,12 +107,9 @@ const http = {
       }
     });
   },
-  getFirstPendingPostsData({
-    groupId,
-    orderBy = "RECENT" // RECENT, CHRONOLOGICAL
-  }) {
+  getFirstPendingPostsData({ groupId, roleId, orderBy }) {
     var data = qs.stringify({
-      av: "116416613072624",
+      av: roleId,
       doc_id: "3829723863714756",
       fb_api_req_friendly_name: "GroupsCometPendingPostsPostsSectionQuery",
       fb_dtsg: USER().dtsg,
@@ -137,17 +134,12 @@ const http = {
       })
     });
     return $axios.post("https://www.facebook.com/api/graphql/?getFirstPendingPostsData", data, {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      notLoading: true
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
     });
   },
-  getNextPendingPostsData({
-    cursor,
-    groupId,
-    orderBy = "RECENT" // RECENT, CHRONOLOGICAL
-  }) {
+  getNextPendingPostsData({ cursor, groupId, roleId, orderBy }) {
     var data = qs.stringify({
-      av: "116416613072624",
+      av: roleId,
       doc_id: "4586194724724815",
       fb_api_req_friendly_name: "GroupsCometPendingPostsFeedPaginationQuery",
       fb_dtsg: USER().dtsg,
@@ -174,13 +166,12 @@ const http = {
       })
     });
     return $axios.post("https://www.facebook.com/api/graphql/?getNextPendingPostsData", data, {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      notLoading: true
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
     });
   },
-  removePost({ postId, groupId }) {
+  removePost({ postId, groupId, roleId }) {
     var data = qs.stringify({
-      av: "116416613072624",
+      av: roleId,
       doc_id: "3365842253444071",
       fb_api_req_friendly_name: "useGroupsCometDeclinePendingStoryMutation",
       fb_dtsg: USER().dtsg,
@@ -189,7 +180,7 @@ const http = {
           group_id: groupId,
           source: "group_pending_posts",
           story_id: postId,
-          actor_id: "116416613072624",
+          actor_id: "100003216282880",
           client_mutation_id: "1"
         },
         memberID: "100049815155317"
@@ -200,9 +191,9 @@ const http = {
       notLoading: true
     });
   },
-  approvePost({ postId, groupId }) {
+  approvePost({ postId, groupId, roleId }) {
     var data = qs.stringify({
-      av: "116416613072624",
+      av: roleId,
       doc_id: "4092490014154806",
       fb_api_req_friendly_name: "useGroupsCometApprovePendingStoryMutation",
       fb_dtsg: USER().dtsg,
@@ -210,7 +201,7 @@ const http = {
         input: {
           group_id: groupId,
           story_id: postId,
-          actor_id: "116416613072624",
+          actor_id: "100003216282880",
           client_mutation_id: "1"
         },
         displayCommentsFeedbackContext: null,

@@ -3,7 +3,7 @@
     <!-- Row Search -->
     <div class="row border border-dark rounded pt-2 mb-3">
       <div class="col-12">
-        <form class="form-inline" @submit.prevent="reload">
+        <form class="form-inline" @submit.prevent="updateQuery">
           <div class="form-group mb-2 mr-3">
             <label for="groupId" class="mr-1">ID nhóm:</label>
             <input type="text" class="form-control" id="groupId" v-model="query.groupId" />
@@ -16,12 +16,23 @@
             </select>
           </div>
           <div class="form-group mb-2 mr-3">
+            <label for="roleId" class="mr-1">Role ID:</label>
+            <input type="text" class="form-control" id="roleId" v-model="query.roleId" />
+          </div>
+          <div class="form-group mb-2 mr-3">
             <div class="custom-control custom-switch">
               <input type="checkbox" class="custom-control-input" id="autoApprove" v-model="query.autoApprove" />
-              <label class="custom-control-label" for="autoApprove">Tự động phê duyệt bài viết</label>
+              <label class="custom-control-label" for="autoApprove">Tự động phê duyệt</label>
             </div>
           </div>
-          <button type="submit" class="btn btn-info mb-2">Cập nhật</button>
+          <div class="form-group mb-2 mr-3">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="autoReload" v-model="query.autoReload" />
+              <label class="custom-control-label" for="autoReload">Tự động cập nhật</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-info mb-2 mr-2">Cập nhật</button>
+          <button type="button" class="btn btn-secondary mb-2" @click="getNextPostList()">Tải thêm</button>
         </form>
       </div>
     </div>
@@ -79,7 +90,8 @@
 </template>
 
 <script>
-const REJECTS = [
+const REJECT_LIST = [
+  "con đĩ",
   "tuyển nhân viên",
   "trẻ trâu",
   "lđ",
@@ -192,7 +204,7 @@ const BLACK_LIST = [
   "giá cả"
 ];
 
-const APPROVES = ["tuyển thành viên", "tuyển tv", "ttv"];
+const APPROVE_LIST = ["tuyển thành viên", "tuyển tv", "ttv"];
 
 export default {
   data() {
@@ -200,36 +212,56 @@ export default {
       query: {
         groupId: "694039351025214",
         orderBy: "RECENT",
-        autoApprove: true
+        roleId: "109868527274175",
+        autoApprove: false,
+        autoReload: false
       },
-      groupId: null,
-      orderBy: null,
-      autoApprove: true,
+      groupId: "",
+      orderBy: "",
+      roleId: "",
+      autoApprove: false,
+      autoReload: false,
+      autoReloadInterval: null,
 
       cursor: null,
       posts: []
     };
   },
   created() {
-    this.reload();
-
-    setInterval(() => {
-      console.log("RELOAD!!!");
-      this.reload();
-    }, 30 * 1000);
+    this.updateQuery();
+  },
+  watch: {
+    autoReload() {
+      if (this.autoReload) {
+        this.autoReloadInterval = setInterval(() => {
+          console.log("RELOAD...");
+          this.reload();
+        }, 30 * 1000);
+      } else if (this.autoReloadInterval !== null) {
+        clearInterval(this.autoReloadInterval);
+      }
+    }
   },
   methods: {
-    async reload() {
+    updateQuery() {
       this.groupId = this.query.groupId;
       this.orderBy = this.query.orderBy;
+      this.roleId = this.query.roleId;
       this.autoApprove = this.query.autoApprove;
-
+      this.autoReload = this.query.autoReload;
+      this.reload();
+    },
+    async reload() {
       this.cursor = null;
       this.posts = [];
       this.getNextPostList(await this.getFirstPendingPostsCursor());
     },
     async getFirstPendingPostsCursor() {
-      const response = await this.$http.getFirstPendingPostsData({ groupId: this.groupId, orderBy: this.orderBy });
+      const response = await this.$http.getFirstPendingPostsData({
+        groupId: this.groupId,
+        roleId: this.roleId,
+        orderBy: this.orderBy
+      });
       if (response) {
         this.cursor = response.data.data.group["pending_posts_section_stories"]["page_info"]["end_cursor"];
         return response.data.data.group["pending_posts_section_stories"]["edges"];
@@ -240,142 +272,152 @@ export default {
       const response = await this.$http.getNextPendingPostsData({
         cursor: this.cursor,
         groupId: this.groupId,
+        roleId: this.roleId,
         orderBy: this.orderBy
       });
       if (response) {
-        this.posts = availableEdges
-          .concat(response.data.data.node["pending_posts_section_stories"].edges)
-          .map(edge => edge.node)
-          .filter(node => {
-            let approved =
-              node["attached_story"] === null && // không phải bài chia sẻ
-              node["comet_sections"]["content"] !== null &&
-              node["comet_sections"]["content"]["story"]["comet_sections"]["message"] !== null &&
-              (() => {
-                // không phải bài chia sẻ hoặc unavailable
-                const styleList = node["comet_sections"]["content"]["story"]["attachments"]
-                  .map(attachment => attachment["style_list"])
-                  .reduce((styleList, style) => {
-                    return styleList.concat(style);
-                  }, []);
-                return styleList.indexOf("share") === -1 && styleList.indexOf("unavailable") === -1;
-              })();
+        this.posts = this.posts.concat(
+          availableEdges
+            .concat(response.data.data.node["pending_posts_section_stories"].edges)
+            .map(edge => edge.node)
+            .filter(node => {
+              let approved =
+                node["attached_story"] === null && // không phải bài chia sẻ
+                node["comet_sections"]["content"] !== null &&
+                node["comet_sections"]["content"]["story"]["comet_sections"]["message"] !== null &&
+                (() => {
+                  // không phải bài chia sẻ hoặc unavailable
+                  const styleList = node["comet_sections"]["content"]["story"]["attachments"]
+                    .map(attachment => attachment["style_list"])
+                    .reduce((styleList, style) => {
+                      return styleList.concat(style);
+                    }, []);
+                  return styleList.indexOf("share") === -1 && styleList.indexOf("unavailable") === -1;
+                })();
 
-            if (approved) {
-              const content = this.getContent(node);
-              const rejected = this.hasRejection(content);
-              if (rejected) {
-                console.log("Has rejection: " + content);
-                this.$store.commit("pushRejectedContent", { content });
-              }
-              approved = approved && rejected === false;
-            }
-
-            if (!approved) {
-              this.$http.removePost({ postId: node["id"], groupId: this.groupId });
-            }
-
-            return approved;
-          })
-          .map(node => {
-            return {
-              id: node["id"],
-              timestamp: new Date(node["comet_sections"]["timestamp"]["story"]["creation_time"] * 1000),
-              actors: node["actors"].map(actor => actor.name).join(", "),
-              message: this.getContent(node),
-              attachments: node["comet_sections"]["content"]["story"]["attachments"]
-                .map(attachment => {
-                  let images = [];
-                  if (attachment["style_type_renderer"]["attachment"]["media"]) {
-                    if (attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]) {
-                      images.push(attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]["uri"]);
-                    } else {
-                      images.push(attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]["uri"]);
-                    }
-                  }
-                  if (attachment["style_type_renderer"]["attachment"]["all_subattachments"]) {
-                    images = images.concat(
-                      attachment["style_type_renderer"]["attachment"]["all_subattachments"]["nodes"].map(
-                        node => node["media"]["image"]["uri"]
-                      )
-                    );
-                  }
-                  return images;
-                })
-                .reduce((images, attachments) => {
-                  return images.concat(attachments);
-                }, []),
-              countLoaded: 0
-            };
-          })
-          .map(node => ({
-            ...node,
-            probablyApprovedImage: true,
-            probablyApprovedContent: !this.hasWarning(node.message)
-          }))
-          .map(node => ({
-            ...node,
-            probablyApproved: (() => {
-              if (node.attachments.length === 0 && node.probablyApprovedContent) {
-                if (this.autoApprove) {
-                  setTimeout(() => {
-                    console.log("Tự động approve: " + node.id);
-                    this.approvePost(node.id);
-                  }, 3000);
+              if (approved) {
+                const content = this.getContent(node);
+                const rejected = this.hasRejection(content);
+                if (rejected) {
+                  console.log("Has rejection: " + content);
+                  this.$store.commit("pushRejectedContent", { content });
                 }
+                approved = rejected === false;
               }
-              return node.probablyApprovedContent;
-            })()
-          }));
+
+              if (!approved) {
+                this.removePost(node["id"]);
+              }
+
+              return approved;
+            })
+            .map(node => {
+              try {
+                return {
+                  id: node["id"],
+                  timestamp: new Date(node["comet_sections"]["timestamp"]["story"]["creation_time"] * 1000),
+                  actors: node["actors"].map(actor => actor.name).join(", "),
+                  message: this.getContent(node),
+                  attachments: node["comet_sections"]["content"]["story"]["attachments"]
+                    .map(attachment => {
+                      let images = [];
+                      if (attachment["style_type_renderer"]["attachment"]["media"]) {
+                        if (attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]) {
+                          images.push(attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]["uri"]);
+                        } else if (attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]) {
+                          images.push(
+                            attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]["uri"]
+                          );
+                        } else {
+                          images.push(attachment["style_type_renderer"]["attachment"]["media"]["image"]["uri"]);
+                        }
+                      }
+                      if (attachment["style_type_renderer"]["attachment"]["all_subattachments"]) {
+                        images = images.concat(
+                          attachment["style_type_renderer"]["attachment"]["all_subattachments"]["nodes"].map(
+                            node => node["media"]["image"]["uri"]
+                          )
+                        );
+                      }
+                      return images;
+                    })
+                    .reduce((images, attachments) => {
+                      return images.concat(attachments);
+                    }, [])
+                };
+              } catch (e) {
+                console.log(node);
+                console.log(e);
+                return null;
+              }
+            })
+            .filter(node => node !== null)
+            .map(node => ({
+              ...node,
+              countLoaded: 0,
+              probablyApprovedImage: true,
+              probablyApprovedContent: !this.hasWarning(node.message)
+            }))
+            .map(node => ({
+              ...node,
+              probablyApproved: (() => {
+                if (node.attachments.length === 0 && node.probablyApprovedContent) {
+                  if (this.autoApprove) {
+                    setTimeout(() => {
+                      console.log("Tự động phê duyệt: " + node.message);
+                      this.approvePost(node.id);
+                    }, 3000);
+                  }
+                }
+                return node.probablyApprovedContent;
+              })()
+            }))
+        );
         this.cursor = response.data.data.node["pending_posts_section_stories"]["page_info"]["end_cursor"];
       }
     },
     hasRejection(content) {
-      var rejected = false;
       content = content.normalize("NFC").toLowerCase();
-      for (let text of APPROVES) {
+      for (let text of APPROVE_LIST) {
         if (content.indexOf(text) > -1) {
           return false;
         }
       }
-      for (let text of REJECTS) {
+      for (let text of REJECT_LIST) {
         if (content.indexOf(text) > -1) {
-          rejected = true;
-          break;
+          return true;
         }
       }
-      return rejected;
+      return false;
     },
     hasWarning(content) {
-      var rejected = false;
-      var list = BLACK_LIST.concat(REJECTS);
+      const LIST = BLACK_LIST.concat(REJECT_LIST);
       content = content.normalize("NFC").toLowerCase();
-      for (let text of list) {
+      for (let text of LIST) {
         if (content.indexOf(text) > -1) {
-          rejected = true;
-          break;
+          return true;
         }
       }
-      return rejected;
+      return false;
     },
     approvePost(id) {
-      this.$http.approvePost({ postId: id, groupId: this.groupId });
+      this.$http.approvePost({ postId: id, groupId: this.groupId, roleId: this.roleId });
       this.posts = this.posts.filter(post => post.id !== id);
     },
     removePost(id) {
-      this.$http.removePost({ postId: id, groupId: this.groupId });
+      this.$http.removePost({ postId: id, groupId: this.groupId, roleId: this.roleId });
       this.posts = this.posts.filter(post => post.id !== id);
     },
     approveAllPosts() {
       for (let post of this.posts) {
-        this.$http.approvePost({ postId: post.id, groupId: this.groupId });
+        this.$http.approvePost({ postId: post.id, groupId: this.groupId, roleId: this.roleId });
       }
       this.posts = [];
       setTimeout(this.getNextPostList, 1000);
     },
     removeAllPosts() {
       for (let post of this.posts) {
-        this.$http.removePost({ postId: post.id, groupId: this.groupId });
+        this.$http.removePost({ postId: post.id, groupId: this.groupId, roleId: this.roleId });
       }
       this.posts = [];
       setTimeout(this.getNextPostList, 1000);
@@ -416,7 +458,7 @@ export default {
         post.probablyApproved = post.probablyApproved && post.probablyApprovedImage;
         if (this.autoApprove && post.probablyApproved) {
           setTimeout(() => {
-            console.log("Tự động approve (có hình ảnh): " + post.id);
+            console.log("Tự động phê duyệt (có hình ảnh): " + post.message);
             this.approvePost(post.id);
           }, 1000);
         }

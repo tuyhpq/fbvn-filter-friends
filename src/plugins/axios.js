@@ -8,10 +8,7 @@ let config = {
 };
 
 const handleError = () => {
-  let message = "Mất kết nối với tài khoản Facebook của bạn.<br>Vui lòng tải lại trang.";
-  $alert.error(message).then(() => {
-    window.location.reload();
-  });
+  console.log("Lỗi gọi API...");
 };
 
 const _axios = axios.create(config);
