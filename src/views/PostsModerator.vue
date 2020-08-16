@@ -182,6 +182,8 @@ const REJECT_LIST = [
 ];
 
 const BLACK_LIST = [
+  "scam",
+  "con chó",
   "xả hàng",
   "kb",
   "add",
