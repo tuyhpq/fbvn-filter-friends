@@ -32,7 +32,10 @@
             </div>
           </div>
           <button type="submit" class="btn btn-info mb-2 mr-2">Cập nhật</button>
-          <button type="button" class="btn btn-secondary mb-2" @click="getNextPostList()">Tải thêm</button>
+          <button type="button" class="btn btn-secondary mb-2 mr-2" @click="getNextPostList()">Tải thêm</button>
+          <button type="button" class="btn btn-danger mb-2 mr-2" @click="autoApproveForGroups">
+            Kiểm duyệt nhiều nhóm
+          </button>
         </form>
       </div>
     </div>
@@ -90,123 +93,15 @@
 </template>
 
 <script>
-const REJECT_LIST = [
-  "con đĩ",
-  "tuyển nhân viên",
-  "trẻ trâu",
-  "lđ",
-  "dịch vụ facebook",
-  " cc",
-  " cl ",
-  " cm",
-  " vl",
-  "ai bán",
-  "ai cần",
-  "ai mua",
-  "bán ac",
-  "bán kim",
-  "bán kc",
-  "bán nick",
-  "bán níck",
-  "bốc phốt",
-  "cày thuê",
-  "cần acc",
-  "cần bán",
-  "cần đổi",
-  "cần mua",
-  "𝗖𝗹𝗶𝗽",
-  "code",
-  "cứt",
-  "dcm",
-  "dkm",
-  "dm",
-  "dâm",
-  "đcm",
-  "địt",
-  "đkm",
-  "đm",
-  "vkl",
-  "đổi ac",
-  "đổi nick",
-  "đổi níck",
-  "event tặng",
-  "gdtg",
-  "giá chỉ",
-  "giá học sinh",
-  "hack",
-  "http",
-  "kc miễn phí",
-  "kc giá rẻ",
-  "kiếm thẻ",
-  "kiếm tiền",
-  "kim cương giá rẻ",
-  "kim cương miễn phí",
-  "liên hệ",
-  "link",
-  "loz",
-  "lồn",
-  "lừa",
-  "miễn phí 100%",
-  "mini game",
-  "minigame",
-  "mua ac",
-  "mua ib",
-  "mua kim",
-  "mua kc",
-  "mua nick",
-  "mua níck",
-  "nghỉ game",
-  "nghĩ game",
-  "ngu",
-  "nhận kim",
-  "nhận kc",
-  "nhận quà",
-  "nhận thẻ",
-  "nhận ac",
-  "nhận nạp k",
-  "óc chó",
-  "sủa",
-  "súc vật",
-  "tặng quà",
-  "tặng thẻ",
-  "tặng kim",
-  "tặng kc",
-  "tặng acc",
-  "trẩu",
-  "tuyển dụng",
-  "uy tín 100%",
-  "zalo",
-  "lộ hàng",
-  "thanh lý",
-  "thanh lí"
-];
+import GroupList from "./GroupList";
 
-const BLACK_LIST = [
-  "scam",
-  "con chó",
-  "xả hàng",
-  "kb",
-  "add",
-  "kết bạn",
-  "ib",
-  "inb",
-  "code",
-  "free",
-  "miễn phí",
-  "uy tín",
-  "link",
-  "clip",
-  "xoxo",
-  "chấm",
-  "dâm",
-  "show",
-  "tặng",
-  "thẻ cào",
-  "nhập mã",
-  "giá cả"
-];
-
-const APPROVE_LIST = ["tuyển thành viên", "tuyển tv", "ttv"];
+let indexGroup = -1;
+const getNextGroup = () => {
+  if (++indexGroup === GroupList.length) {
+    indexGroup = 0;
+  }
+  return GroupList[indexGroup];
+};
 
 export default {
   data() {
@@ -214,7 +109,7 @@ export default {
       query: {
         groupId: "694039351025214",
         orderBy: "RECENT",
-        roleId: "109868527274175",
+        roleId: "116416613072624",
         autoApprove: false,
         autoReload: false
       },
@@ -226,7 +121,10 @@ export default {
       autoReloadInterval: null,
 
       cursor: null,
-      posts: []
+      posts: [],
+      APPROVE_LIST: [],
+      REJECT_LIST: [],
+      BLACK_LIST: []
     };
   },
   created() {
@@ -380,12 +278,12 @@ export default {
     },
     hasRejection(content) {
       content = content.normalize("NFC").toLowerCase();
-      for (let text of APPROVE_LIST) {
+      for (let text of this.APPROVE_LIST) {
         if (content.indexOf(text) > -1) {
           return false;
         }
       }
-      for (let text of REJECT_LIST) {
+      for (let text of this.REJECT_LIST) {
         if (content.indexOf(text) > -1) {
           return true;
         }
@@ -393,7 +291,7 @@ export default {
       return false;
     },
     hasWarning(content) {
-      const LIST = BLACK_LIST.concat(REJECT_LIST);
+      const LIST = this.BLACK_LIST.concat(this.REJECT_LIST);
       content = content.normalize("NFC").toLowerCase();
       for (let text of LIST) {
         if (content.indexOf(text) > -1) {
@@ -465,6 +363,18 @@ export default {
           }, 1000);
         }
       }
+    },
+    autoApproveForGroups() {
+      setInterval(() => {
+        const group = getNextGroup();
+        console.log(`Group: ${group.name}`);
+        this.query.groupId = group.id;
+        this.REJECT_LIST = group.rejectList || [];
+        this.APPROVE_LIST = group.approveList || [];
+        this.BLACK_LIST = group.blackList || [];
+        this.query.autoApprove = !!group.hasApprovePost;
+        this.updateQuery();
+      }, 30 * 1000);
     }
   }
 };
