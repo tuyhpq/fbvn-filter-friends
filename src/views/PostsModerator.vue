@@ -124,10 +124,13 @@ export default {
       posts: [],
       APPROVE_LIST: [],
       REJECT_LIST: [],
-      BLACK_LIST: []
+      BLACK_LIST: [],
+
+      queues: null
     };
   },
   created() {
+    this.queues = this.$common.useQueues();
     this.updateQuery();
   },
   watch: {
@@ -169,112 +172,115 @@ export default {
       return [];
     },
     async getNextPostList(availableEdges = []) {
-      const response = await this.$http.getNextPendingPostsData({
-        cursor: this.cursor,
-        groupId: this.groupId,
-        roleId: this.roleId,
-        orderBy: this.orderBy
-      });
+      const response = this.cursor
+        ? await this.$http.getNextPendingPostsData({
+            cursor: this.cursor,
+            groupId: this.groupId,
+            roleId: this.roleId,
+            orderBy: this.orderBy
+          })
+        : null;
+
+      let edges = [];
       if (response) {
-        this.posts = this.posts.concat(
-          availableEdges
-            .concat(response.data.data.node["pending_posts_section_stories"].edges)
-            .map(edge => edge.node)
-            .filter(node => {
-              let approved =
-                node["attached_story"] === null && // không phải bài chia sẻ
-                node["comet_sections"]["content"] !== null &&
-                node["comet_sections"]["content"]["story"]["comet_sections"]["message"] !== null &&
-                (() => {
-                  // không phải bài chia sẻ hoặc unavailable
-                  const styleList = node["comet_sections"]["content"]["story"]["attachments"]
-                    .map(attachment => attachment["style_list"])
-                    .reduce((styleList, style) => {
-                      return styleList.concat(style);
-                    }, []);
-                  return styleList.indexOf("share") === -1 && styleList.indexOf("unavailable") === -1;
-                })();
-
-              if (approved) {
-                const content = this.getContent(node);
-                const rejected = this.hasRejection(content);
-                if (rejected) {
-                  console.log("Has rejection: " + content);
-                  this.$store.commit("pushRejectedContent", { content });
-                }
-                approved = rejected === false;
-              }
-
-              if (!approved) {
-                this.removePost(node["id"]);
-              }
-
-              return approved;
-            })
-            .map(node => {
-              try {
-                return {
-                  id: node["id"],
-                  timestamp: new Date(node["comet_sections"]["timestamp"]["story"]["creation_time"] * 1000),
-                  actors: node["actors"].map(actor => actor.name).join(", "),
-                  message: this.getContent(node),
-                  attachments: node["comet_sections"]["content"]["story"]["attachments"]
-                    .map(attachment => {
-                      let images = [];
-                      if (attachment["style_type_renderer"]["attachment"]["media"]) {
-                        if (attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]) {
-                          images.push(attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]["uri"]);
-                        } else if (attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]) {
-                          images.push(
-                            attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]["uri"]
-                          );
-                        } else {
-                          images.push(attachment["style_type_renderer"]["attachment"]["media"]["image"]["uri"]);
-                        }
-                      }
-                      if (attachment["style_type_renderer"]["attachment"]["all_subattachments"]) {
-                        images = images.concat(
-                          attachment["style_type_renderer"]["attachment"]["all_subattachments"]["nodes"].map(
-                            node => node["media"]["image"]["uri"]
-                          )
-                        );
-                      }
-                      return images;
-                    })
-                    .reduce((images, attachments) => {
-                      return images.concat(attachments);
-                    }, [])
-                };
-              } catch (e) {
-                console.log(node);
-                console.log(e);
-                return null;
-              }
-            })
-            .filter(node => node !== null)
-            .map(node => ({
-              ...node,
-              countLoaded: 0,
-              probablyApprovedImage: true,
-              probablyApprovedContent: !this.hasWarning(node.message)
-            }))
-            .map(node => ({
-              ...node,
-              probablyApproved: (() => {
-                if (node.attachments.length === 0 && node.probablyApprovedContent) {
-                  if (this.autoApprove) {
-                    setTimeout(() => {
-                      console.log("Tự động phê duyệt: " + node.message);
-                      this.approvePost(node.id);
-                    }, 3000);
-                  }
-                }
-                return node.probablyApprovedContent;
-              })()
-            }))
-        );
+        edges = response.data.data.node["pending_posts_section_stories"].edges;
         this.cursor = response.data.data.node["pending_posts_section_stories"]["page_info"]["end_cursor"];
       }
+      this.posts = this.posts.concat(
+        availableEdges
+          .concat(edges)
+          .map(edge => edge.node)
+          .filter(node => {
+            let approved =
+              node["attached_story"] === null && // không phải bài chia sẻ
+              node["comet_sections"]["content"] !== null &&
+              node["comet_sections"]["content"]["story"]["comet_sections"]["message"] !== null &&
+              (() => {
+                // không phải bài chia sẻ hoặc unavailable
+                const styleList = node["comet_sections"]["content"]["story"]["attachments"]
+                  .map(attachment => attachment["style_list"])
+                  .reduce((styleList, style) => {
+                    return styleList.concat(style);
+                  }, []);
+                return styleList.indexOf("share") === -1 && styleList.indexOf("unavailable") === -1;
+              })();
+
+            if (approved) {
+              const content = this.getContent(node);
+              const rejected = this.hasRejection(content);
+              if (rejected) {
+                console.log("Has rejection: " + content);
+                this.$store.commit("pushRejectedContent", { content });
+              }
+              approved = rejected === false;
+            }
+
+            if (!approved) {
+              this.removePost(node["id"]);
+            }
+
+            return approved;
+          })
+          .map(node => {
+            try {
+              return {
+                id: node["id"],
+                timestamp: new Date(node["comet_sections"]["timestamp"]["story"]["creation_time"] * 1000),
+                actors: node["actors"].map(actor => actor.name).join(", "),
+                message: this.getContent(node),
+                attachments: node["comet_sections"]["content"]["story"]["attachments"]
+                  .map(attachment => {
+                    let images = [];
+                    if (attachment["style_type_renderer"]["attachment"]["media"]) {
+                      if (attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]) {
+                        images.push(attachment["style_type_renderer"]["attachment"]["media"]["photo_image"]["uri"]);
+                      } else if (attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]) {
+                        images.push(attachment["style_type_renderer"]["attachment"]["media"]["thumbnailImage"]["uri"]);
+                      } else {
+                        images.push(attachment["style_type_renderer"]["attachment"]["media"]["image"]["uri"]);
+                      }
+                    }
+                    if (attachment["style_type_renderer"]["attachment"]["all_subattachments"]) {
+                      images = images.concat(
+                        attachment["style_type_renderer"]["attachment"]["all_subattachments"]["nodes"].map(
+                          node => node["media"]["image"]["uri"]
+                        )
+                      );
+                    }
+                    return images;
+                  })
+                  .reduce((images, attachments) => {
+                    return images.concat(attachments);
+                  }, [])
+              };
+            } catch (e) {
+              console.log(node);
+              console.log(e);
+              return null;
+            }
+          })
+          .filter(node => node !== null)
+          .map(node => ({
+            ...node,
+            countLoaded: 0,
+            probablyApprovedImage: true,
+            probablyApprovedContent: !this.hasWarning(node.message)
+          }))
+          .map(node => ({
+            ...node,
+            probablyApproved: (() => {
+              if (node.attachments.length === 0 && node.probablyApprovedContent) {
+                if (this.autoApprove) {
+                  setTimeout(() => {
+                    console.log("Tự động phê duyệt: " + node.message);
+                    this.approvePost(node.id);
+                  }, 3000);
+                }
+              }
+              return node.probablyApprovedContent;
+            })()
+          }))
+      );
     },
     hasRejection(content) {
       content = content.normalize("NFC").toLowerCase();
@@ -301,23 +307,23 @@ export default {
       return false;
     },
     approvePost(id) {
-      this.$http.approvePost({ postId: id, groupId: this.groupId, roleId: this.roleId });
+      this.queues.push(this.$http.approvePost, { postId: id, groupId: this.groupId, roleId: this.roleId });
       this.posts = this.posts.filter(post => post.id !== id);
     },
     removePost(id) {
-      this.$http.removePost({ postId: id, groupId: this.groupId, roleId: this.roleId });
+      this.queues.push(this.$http.removePost, { postId: id, groupId: this.groupId, roleId: this.roleId });
       this.posts = this.posts.filter(post => post.id !== id);
     },
     approveAllPosts() {
       for (let post of this.posts) {
-        this.$http.approvePost({ postId: post.id, groupId: this.groupId, roleId: this.roleId });
+        this.queues.push(this.$http.approvePost, { postId: post.id, groupId: this.groupId, roleId: this.roleId });
       }
       this.posts = [];
       setTimeout(this.getNextPostList, 1000);
     },
     removeAllPosts() {
       for (let post of this.posts) {
-        this.$http.removePost({ postId: post.id, groupId: this.groupId, roleId: this.roleId });
+        this.queues.push(this.$http.removePost, { postId: post.id, groupId: this.groupId, roleId: this.roleId });
       }
       this.posts = [];
       setTimeout(this.getNextPostList, 1000);
@@ -365,6 +371,7 @@ export default {
       }
     },
     autoApproveForGroups() {
+      console.log("Bắt đầu duyệt...");
       setInterval(() => {
         const group = getNextGroup();
         console.log(`Group: ${group.name}`);

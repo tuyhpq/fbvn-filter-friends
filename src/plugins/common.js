@@ -73,6 +73,21 @@ Object.defineProperty(Vue.prototype, "$common", {
       rgb.b = ~~(rgb.b / count);
 
       return rgb;
+    },
+    useQueues() {
+      const queues = [];
+      setInterval(() => {
+        const turn = queues.shift();
+        if (turn) {
+          turn.feature(...turn.args);
+        }
+      }, 500);
+
+      return {
+        push(feature, ...args) {
+          queues.push({ feature, args });
+        }
+      };
     }
   }
 });
