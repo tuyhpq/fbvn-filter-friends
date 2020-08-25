@@ -123,7 +123,8 @@ export default [
     blackList: BLACK_LIST,
     rejectList: REJECT_LIST,
     approveList: APPROVE_LIST,
-    hasApprovePost: true
+    hasApprovePost: true,
+    roleId: "100003216282880"
   },
   // { id: "qv98vn", name: "Mua bán PUBG" }, đã bán
   {
@@ -132,7 +133,8 @@ export default [
     blackList: BLACK_LIST,
     rejectList: REJECT_LIST,
     approveList: APPROVE_LIST,
-    hasApprovePost: true
+    hasApprovePost: true,
+    roleId: "100003216282880"
   },
   {
     id: "298297000328148",
@@ -154,6 +156,15 @@ export default [
   // { id: "108807306468805", name: "LOT" }, đã bán
   // { id: "486751422133880", name: "Hack FF" }, đã bị khóa
   // { id: "1129744734043345", name: "Ngắm Trai" }, đã bán
+  {
+    id: "694039351025214",
+    name: "Free Fire",
+    blackList: BLACK_LIST,
+    rejectList: REJECT_LIST,
+    approveList: APPROVE_LIST,
+    hasApprovePost: true,
+    roleId: "100003216282880"
+  },
   { id: "3120470631310759", name: "Vitamin", hasApprovePost: false },
   { id: "1293192420863686", name: "Cà khịa", hasApprovePost: false },
   // { id: "findbfwifehusbandgf", name: "Cung đấu" }, // đã bán

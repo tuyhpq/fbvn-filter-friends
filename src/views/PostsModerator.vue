@@ -131,6 +131,15 @@ export default {
   },
   created() {
     this.queues = this.$common.useQueues();
+    var group = GroupList[0];
+    console.log(`Group: ${group.name}`);
+    this.query.groupId = group.id;
+    this.query.roleId = group.roleId || "116416613702624";
+    this.REJECT_LIST = group.rejectList || [];
+    this.APPROVE_LIST = group.approveList || [];
+    this.BLACK_LIST = group.blackList || [];
+    this.query.autoApprove = !!group.hasApprovePost;
+
     this.updateQuery();
   },
   watch: {
@@ -139,7 +148,7 @@ export default {
         this.autoReloadInterval = setInterval(() => {
           console.log("RELOAD...");
           this.reload();
-        }, 30 * 1000);
+        }, 60 * 1000);
       } else if (this.autoReloadInterval !== null) {
         clearInterval(this.autoReloadInterval);
       }
@@ -151,6 +160,7 @@ export default {
       this.orderBy = this.query.orderBy;
       this.roleId = this.query.roleId;
       this.autoApprove = this.query.autoApprove;
+      console.log(this.query.autoApprove);
       this.autoReload = this.query.autoReload;
       this.reload();
     },
@@ -376,6 +386,7 @@ export default {
         const group = getNextGroup();
         console.log(`Group: ${group.name}`);
         this.query.groupId = group.id;
+        this.query.roleId = group.roleId || "116416613702624";
         this.REJECT_LIST = group.rejectList || [];
         this.APPROVE_LIST = group.approveList || [];
         this.BLACK_LIST = group.blackList || [];
