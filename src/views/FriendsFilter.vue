@@ -19,99 +19,47 @@
               </div>
               <div class="pl-3" v-show="queries.gender">
                 <div class="custom-control custom-checkbox">
-                  <input
-                    class="custom-control-input"
-                    type="checkbox"
-                    id="customMale"
-                    value="male"
-                    v-model="queries.genderValue"
-                  />
+                  <input class="custom-control-input" type="checkbox" id="customMale" value="male" v-model="queries.genderValue" />
                   <label for="customMale" class="custom-control-label">Nam</label>
                 </div>
                 <div class="custom-control custom-checkbox">
-                  <input
-                    class="custom-control-input"
-                    type="checkbox"
-                    id="customFemale"
-                    value="female"
-                    v-model="queries.genderValue"
-                  />
+                  <input class="custom-control-input" type="checkbox" id="customFemale" value="female" v-model="queries.genderValue" />
                   <label for="customFemale" class="custom-control-label">Nữ</label>
                 </div>
                 <div class="custom-control custom-checkbox">
-                  <input
-                    class="custom-control-input"
-                    type="checkbox"
-                    id="customUnknownGender"
-                    value="unknown"
-                    v-model="queries.genderValue"
-                  />
+                  <input class="custom-control-input" type="checkbox" id="customUnknownGender" value="unknown" v-model="queries.genderValue" />
                   <label for="customUnknownGender" class="custom-control-label">Không xác định</label>
                 </div>
               </div>
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
-                <input
-                  class="custom-control-input"
-                  type="checkbox"
-                  id="checkboxMutualFriend"
-                  v-model="queries.mutualFriend"
-                  :disabled="loadedMutualFriends !== 100"
-                />
+                <input class="custom-control-input" type="checkbox" id="checkboxMutualFriend" v-model="queries.mutualFriend" :disabled="loadedMutualFriends !== 100" />
                 <label for="checkboxMutualFriend" class="custom-control-label">
                   Số lượng bạn chung
-                  <template v-if="loadedMutualFriends !== 100">
-                    (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedMutualFriends }}%)
-                  </template>
+                  <template v-if="loadedMutualFriends !== 100"> (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedMutualFriends }}%) </template>
                 </label>
               </div>
               <div class="pl-3 mt-1" v-show="queries.mutualFriend">
                 <label class="mr-1">Nhỏ hơn</label>
-                <input
-                  type="text"
-                  class="form-control w-auto d-inline-block"
-                  v-model="queries.mutualFriendValue"
-                  @blur="blurMutualFriendValue"
-                />
+                <input type="text" class="form-control w-auto d-inline-block" v-model="queries.mutualFriendValue" @blur="blurMutualFriendValue" />
               </div>
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
-                <input
-                  class="custom-control-input"
-                  type="checkbox"
-                  id="checkboxNotCountryVi"
-                  v-model="queries.notCountryVi"
-                  :disabled="loadedFriendsCountry !== 100"
-                />
-                <label for="checkboxNotCountryVi" class="custom-control-label">
-                  Quốc gia không phải Việt Nam
-                  <template v-if="loadedFriendsCountry !== 100">
-                    (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedFriendsCountry }}%)
-                  </template>
-                </label>
+                <input class="custom-control-input" type="checkbox" id="checkboxNotCountryVi" v-model="queries.notCountryVi" />
+                <label for="checkboxNotCountryVi" class="custom-control-label">Quốc gia không phải Việt Nam</label>
               </div>
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
-                <input
-                  class="custom-control-input"
-                  type="checkbox"
-                  id="checkboxNotAvatar"
-                  v-model="queries.notAvatar"
-                />
+                <input class="custom-control-input" type="checkbox" id="checkboxNotAvatar" v-model="queries.notAvatar" />
                 <label for="checkboxNotAvatar" class="custom-control-label">Không có ảnh đại diện</label>
               </div>
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
-                <input
-                  class="custom-control-input"
-                  type="checkbox"
-                  id="checkboxSpecialCharacters"
-                  v-model="queries.specialCharacters"
-                />
+                <input class="custom-control-input" type="checkbox" id="checkboxSpecialCharacters" v-model="queries.specialCharacters" />
                 <label for="checkboxSpecialCharacters" class="custom-control-label">
                   Tên chứa kí tự đặc biệt
                 </label>
@@ -119,63 +67,27 @@
             </div>
             <div class="form-group">
               <div class="custom-control custom-checkbox">
-                <input
-                  class="custom-control-input"
-                  type="checkbox"
-                  id="checkboxNotPosts"
-                  v-model="queries.notPosts"
-                  :disabled="loadedFriendsPost !== 100"
-                />
+                <input class="custom-control-input" type="checkbox" id="checkboxNotPosts" v-model="queries.notPosts" :disabled="loadedFriendsPost !== 100" />
                 <label for="checkboxNotPosts" class="custom-control-label">
                   Không đăng bài trong một khoảng thời gian
-                  <template v-if="loadedFriendsPost !== 100">
-                    (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedFriendsPost }}%)
-                  </template>
+                  <template v-if="loadedFriendsPost !== 100"> (<font-awesome-icon :icon="['fas', 'spinner']" spin /> {{ loadedFriendsPost }}%) </template>
                 </label>
               </div>
               <div class="pl-3" v-show="queries.notPosts">
                 <div class="custom-control custom-radio">
-                  <input
-                    class="custom-control-input"
-                    type="radio"
-                    id="radioNotPosts1"
-                    name="radioNotPosts"
-                    value="3d"
-                    v-model="queries.notPostsValue"
-                  />
+                  <input class="custom-control-input" type="radio" id="radioNotPosts1" name="radioNotPosts" value="3d" v-model="queries.notPostsValue" />
                   <label for="radioNotPosts1" class="custom-control-label">3 ngày gần đây</label>
                 </div>
                 <div class="custom-control custom-radio">
-                  <input
-                    class="custom-control-input"
-                    type="radio"
-                    id="radioNotPosts2"
-                    name="radioNotPosts"
-                    value="1w"
-                    v-model="queries.notPostsValue"
-                  />
+                  <input class="custom-control-input" type="radio" id="radioNotPosts2" name="radioNotPosts" value="1w" v-model="queries.notPostsValue" />
                   <label for="radioNotPosts2" class="custom-control-label">1 tuần gần đây</label>
                 </div>
                 <div class="custom-control custom-radio">
-                  <input
-                    class="custom-control-input"
-                    type="radio"
-                    id="radioNotPosts3"
-                    name="radioNotPosts"
-                    value="1M"
-                    v-model="queries.notPostsValue"
-                  />
+                  <input class="custom-control-input" type="radio" id="radioNotPosts3" name="radioNotPosts" value="1M" v-model="queries.notPostsValue" />
                   <label for="radioNotPosts3" class="custom-control-label">1 tháng gần đây</label>
                 </div>
                 <div class="custom-control custom-radio">
-                  <input
-                    class="custom-control-input"
-                    type="radio"
-                    id="radioNotPosts4"
-                    name="radioNotPosts"
-                    value="1y"
-                    v-model="queries.notPostsValue"
-                  />
+                  <input class="custom-control-input" type="radio" id="radioNotPosts4" name="radioNotPosts" value="1y" v-model="queries.notPostsValue" />
                   <label for="radioNotPosts4" class="custom-control-label">1 năm gần đây</label>
                 </div>
               </div>
@@ -207,13 +119,7 @@
                 <tr>
                   <th width="10%">
                     <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="checkboxAll"
-                        v-model="selectedAllFriend"
-                        @change="selectAllFriend"
-                      />
+                      <input type="checkbox" class="custom-control-input" id="checkboxAll" v-model="selectedAllFriend" @change="selectAllFriend" />
                       <label for="checkboxAll" class="custom-control-label"></label>
                     </div>
                   </th>
@@ -225,13 +131,7 @@
                 <tr v-for="friend in filterFriendList" :key="friend.id">
                   <td class="align-middle">
                     <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        :id="`checkbox${friend.id}`"
-                        v-model="friend.selected"
-                        @change="selectFriend(friend.selected)"
-                      />
+                      <input type="checkbox" class="custom-control-input" :id="`checkbox${friend.id}`" v-model="friend.selected" @change="selectFriend(friend.selected)" />
                       <label :for="`checkbox${friend.id}`" class="custom-control-label" v-once></label>
                     </div>
                   </td>
@@ -258,25 +158,11 @@
             <span class="badge badge-info mr-1">Mẹo</span>
             <label class="mr-3 mb-0">Bôi đen cột ID để</label>
             <div class="custom-control custom-radio custom-control-inline">
-              <input
-                class="custom-control-input"
-                type="radio"
-                id="radioSelection1"
-                name="radioSelection"
-                value="CHECK"
-                v-model="selectionMode"
-              />
+              <input class="custom-control-input" type="radio" id="radioSelection1" name="radioSelection" value="CHECK" v-model="selectionMode" />
               <label for="radioSelection1" class="custom-control-label">Chọn</label>
             </div>
             <div class="custom-control custom-radio custom-control-inline">
-              <input
-                class="custom-control-input"
-                type="radio"
-                id="radioSelection2"
-                name="radioSelection"
-                value="UNCHECK"
-                v-model="selectionMode"
-              />
+              <input class="custom-control-input" type="radio" id="radioSelection2" name="radioSelection" value="UNCHECK" v-model="selectionMode" />
               <label for="radioSelection2" class="custom-control-label">Bỏ chọn</label>
             </div>
           </div>
@@ -294,7 +180,6 @@ export default {
       friendList: [],
       filterFriendList: [],
       loadedMutualFriends: 0,
-      loadedFriendsCountry: 0,
       loadedFriendsPost: 0,
       queries: {
         gender: false,
@@ -328,7 +213,6 @@ export default {
   created() {
     this.getFriendList(() => {
       this.loadMutualFriends();
-      this.loadFriendsCountry();
       this.loadFriendsPost();
     });
     document.body.addEventListener("mouseup", this.selectionEventListener);
@@ -354,18 +238,42 @@ export default {
       });
     },
     async getFriendList(next) {
-      let response = await this.$http.getFriendList();
-      if (response) {
-        let friendList = response.data.data;
+      if (this.$store.state.friends.length > 0) {
+        this.friendList = this.$store.state.friends;
+        return next && next();
+      }
 
-        for (let friend of friendList) {
-          friend.selected = false;
-          if (friend.gender !== "male" && friend.gender !== "female") {
-            friend.gender = "unknown";
+      let response = await this.$http.getFriendList(["name", "gender"]);
+      if (response) {
+        let responsePicture = await this.$http.getFriendList(["picture{is_silhouette,url}"]);
+        if (responsePicture) {
+          let responseCountry = await this.$http.getFriendList(["location{location{country,country_code}}", "hometown{location{country,country_code}}", "locale"]);
+          if (responseCountry) {
+            let friendList = response.data.data;
+            let pictureFriendList = responsePicture.data.data;
+            let countryFriendList = responseCountry.data.data;
+
+            for (let friend of friendList) {
+              friend.selected = false;
+              if (friend.gender !== "male" && friend.gender !== "female") {
+                friend.gender = "unknown";
+              }
+              let pictureFriend = pictureFriendList.find(x => x.id === friend.id);
+              if (pictureFriend) {
+                friend["picture"] = pictureFriend["picture"];
+              }
+              let countryFriend = countryFriendList.find(x => x.id === friend.id);
+              if (countryFriend) {
+                friend["location"] = countryFriend["location"];
+                friend["hometown"] = countryFriend["hometown"];
+                friend["locale"] = countryFriend["locale"];
+              }
+            }
+            this.friendList = friendList;
+            this.$store.commit("setFriends", { friends: this.friendList });
+            return next && next();
           }
         }
-        this.friendList = friendList;
-        next && next();
       }
     },
     async loadMutualFriends() {
@@ -390,32 +298,8 @@ export default {
         this.loadedMutualFriends = 100;
       }
     },
-    async loadFriendsCountry() {
-      let response = await this.$http.getFriendList(
-        ["location{location{country,country_code}}", "hometown{location{country,country_code}}", "locale"],
-        5000,
-        true
-      );
-      if (response) {
-        let countryFriendList = response.data.data;
-
-        for (let friend of this.friendList) {
-          let countryFriend = countryFriendList.find(x => x.id === friend.id);
-          if (countryFriend) {
-            friend["location"] = countryFriend["location"];
-            friend["hometown"] = countryFriend["hometown"];
-            friend["locale"] = countryFriend["locale"];
-          }
-        }
-        this.loadedFriendsCountry = 100;
-      }
-    },
     async loadFriendsPost() {
-      let response = await this.$http.getFriendList(
-        [`posts.since(${this.oneYearAgo}).limit(10){created_time}`],
-        25,
-        true
-      );
+      let response = await this.$http.getFriendList([`posts.since(${this.oneYearAgo}).limit(10){created_time}`], 25, true);
       if (response) {
         let postFriendList = response.data.data;
         while (response && response.data.paging.next && this.$route.name === this.screenName) {
@@ -448,17 +332,14 @@ export default {
             let unfriend = unfriendList[0];
             let response = await this.$http.removeFriend(unfriend.id);
             if (response) {
-              this.$alert.toastSuccess(
-                `Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thành công.`
-              );
+              this.$alert.toastSuccess(`Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thành công.`);
             } else {
-              this.$alert.toastError(
-                `Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thất bại.`
-              );
+              this.$alert.toastError(`Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thất bại.`);
             }
             unfriendList.removeAt(0);
             this.filterFriendList.remove(unfriend);
             this.friendList.remove(unfriend);
+            this.$store.commit("setFriends", { friends: this.friendList });
 
             await this.$common.sleep(3000);
 
@@ -518,13 +399,7 @@ export default {
           if (friend.posts && friend.posts.data && friend.posts.data.length > 0) {
             let recentPostTime = this.$moment(friend.posts.data[0].created_time).unix();
             let timeAgo =
-              this.queries.notPostsValue === "3d"
-                ? this.threeDayAgo
-                : this.queries.notPostsValue === "1w"
-                ? this.oneWeekAgo
-                : this.queries.notPostsValue === "1M"
-                ? this.oneMonthAgo
-                : this.oneYearAgo;
+              this.queries.notPostsValue === "3d" ? this.threeDayAgo : this.queries.notPostsValue === "1w" ? this.oneWeekAgo : this.queries.notPostsValue === "1M" ? this.oneMonthAgo : this.oneYearAgo;
             if (recentPostTime > timeAgo) {
               return false;
             }
@@ -565,11 +440,7 @@ export default {
       }
     },
     blurMutualFriendValue() {
-      if (
-        this.queries.mutualFriendValue.length === 0 ||
-        !isFinite(this.queries.mutualFriendValue) ||
-        parseInt(this.queries.mutualFriendValue) < 1
-      ) {
+      if (this.queries.mutualFriendValue.length === 0 || !isFinite(this.queries.mutualFriendValue) || parseInt(this.queries.mutualFriendValue) < 1) {
         this.queries.mutualFriendValue = "1";
       } else {
         this.queries.mutualFriendValue = parseInt(this.queries.mutualFriendValue).toString();

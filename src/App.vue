@@ -95,7 +95,9 @@ export default {
     };
   },
   created() {
-    this.fetch();
+    if (!this.$store.state.user.id) {
+      this.fetch();
+    }
 
     // override plugin for $loader
     this.$loader.fadeIn = () => {

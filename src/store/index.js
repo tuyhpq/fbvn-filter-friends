@@ -6,18 +6,22 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: {}
+    user: {},
+    friends: []
   },
   mutations: {
     login(state, { user }) {
       state.user = user;
+    },
+    setFriends(state, { friends }) {
+      state.friends = friends;
     }
   },
   actions: {},
   modules: {},
   plugins: [
     createPersistedState({
-      paths: []
+      paths: ["user", "friends"]
     })
   ]
 });

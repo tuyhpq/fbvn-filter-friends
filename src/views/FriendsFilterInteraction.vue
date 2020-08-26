@@ -20,33 +20,21 @@
                 <tr>
                   <th width="10%">
                     <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="checkboxAll"
-                        v-model="selectedAllFriend"
-                        @change="selectAllFriend"
-                      />
+                      <input type="checkbox" class="custom-control-input" id="checkboxAll" v-model="selectedAllFriend" @change="selectAllFriend" />
                       <label for="checkboxAll" class="custom-control-label"></label>
                     </div>
                   </th>
                   <th width="20%">ID</th>
                   <th width="30%">Tên</th>
-                  <th width="20%">Reaction</th>
-                  <th width="20%">Comment</th>
+                  <th width="20%">Lượt tương tác</th>
+                  <th width="20%">Lượt bình luận</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="friend in friendList" :key="friend.id">
                   <td class="align-middle">
                     <div class="custom-control custom-checkbox">
-                      <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        :id="`checkbox${friend.id}`"
-                        v-model="friend.selected"
-                        @change="selectFriend(friend.selected)"
-                      />
+                      <input type="checkbox" class="custom-control-input" :id="`checkbox${friend.id}`" v-model="friend.selected" @change="selectFriend(friend.selected)" />
                       <label :for="`checkbox${friend.id}`" class="custom-control-label" v-once></label>
                     </div>
                   </td>
@@ -75,25 +63,11 @@
             <span class="badge badge-info mr-1">Mẹo</span>
             <label class="mr-3 mb-0">Bôi đen cột ID để</label>
             <div class="custom-control custom-radio custom-control-inline">
-              <input
-                class="custom-control-input"
-                type="radio"
-                id="radioSelection1"
-                name="radioSelection"
-                value="CHECK"
-                v-model="selectionMode"
-              />
+              <input class="custom-control-input" type="radio" id="radioSelection1" name="radioSelection" value="CHECK" v-model="selectionMode" />
               <label for="radioSelection1" class="custom-control-label">Chọn</label>
             </div>
             <div class="custom-control custom-radio custom-control-inline">
-              <input
-                class="custom-control-input"
-                type="radio"
-                id="radioSelection2"
-                name="radioSelection"
-                value="UNCHECK"
-                v-model="selectionMode"
-              />
+              <input class="custom-control-input" type="radio" id="radioSelection2" name="radioSelection" value="UNCHECK" v-model="selectionMode" />
               <label for="radioSelection2" class="custom-control-label">Bỏ chọn</label>
             </div>
           </div>
@@ -144,7 +118,7 @@ export default {
       });
     },
     async getFriendList() {
-      let response = await this.$http.getFriendList();
+      let response = await this.$http.getFriendList(["name", "picture{url}"]);
       if (response) {
         let friendList = response.data.data;
 
@@ -209,13 +183,9 @@ export default {
             let unfriend = unfriendList[0];
             let response = await this.$http.removeFriend(unfriend.id);
             if (response) {
-              this.$alert.toastSuccess(
-                `Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thành công.`
-              );
+              this.$alert.toastSuccess(`Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thành công.`);
             } else {
-              this.$alert.toastError(
-                `Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thất bại.`
-              );
+              this.$alert.toastError(`Hủy kết bạn với <a target="_blank" href="https://www.facebook.com/profile.php?id=${unfriend.id}">${unfriend.name}</a> thất bại.`);
             }
             unfriendList.removeAt(0);
             this.friendList.remove(unfriend);

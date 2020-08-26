@@ -13,7 +13,7 @@ module.exports = {
     "prettier/prettier": [
       "error",
       {
-        printWidth: 120
+        printWidth: 200
       }
     ]
   }

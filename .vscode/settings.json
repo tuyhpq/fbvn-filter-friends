@@ -14,7 +14,7 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "prettier.printWidth": 120,
+  "prettier.printWidth": 200,
   "prettier.trailingComma": "none",
   "prettier.arrowParens": "avoid",
   "editor.formatOnSave": true,
